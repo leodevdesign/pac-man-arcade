@@ -614,11 +614,13 @@ html, body {
   max-height: 92vh;
 }
 
-/* Modal do Estúdio de Labirintos em 70% da tela (sem esticar excessivamente) */
+/* Modal do Estúdio de Labirintos Compacto e Centralizado (~54% da tela) */
 .editor-content.modal-wide {
-  max-width: 70vw;
-  width: 70vw;
+  max-width: 54vw;
+  width: 54vw;
+  min-width: 660px;
   max-height: 88vh;
+  margin: auto;
 }
 
 .editor-content.modal-compact {
@@ -667,12 +669,12 @@ html, body {
 }
 
 /* =========================================================================
- * 🛠️ ESTÚDIO DE LABIRINTOS (Layout Studio 70% com Alturas 100% Iguais)
+ * 🛠️ ESTÚDIO DE LABIRINTOS (Layout Studio Compacto ~54% com Alturas Alinhadas)
  * ========================================================================= */
 .editor-studio-layout {
   display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 20px;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
   align-items: stretch; /* Garante que os dois blocos tenham rigorosamente a mesma altura */
 }
 
@@ -681,7 +683,7 @@ html, body {
   border: 2.5px solid #7c3aed;
   box-shadow: 0 0 25px rgba(124, 58, 237, 0.35);
   border-radius: 12px;
-  padding: 8px;
+  padding: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -694,14 +696,14 @@ html, body {
   image-rendering: pixelated;
   width: 100%;
   height: auto;
-  max-height: 480px;
+  max-height: 460px;
 }
 
 .editor-panel-controls {
   background: rgba(24, 11, 48, 0.75);
   border: 1.5px solid var(--na-purple-border);
   border-radius: 12px;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Distribui as seções de cima a baixo alinhando com a altura do mapa */
@@ -711,7 +713,7 @@ html, body {
 
 .editor-group-title {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--na-purple-light);
   letter-spacing: 0.5px;
@@ -720,8 +722,8 @@ html, body {
 
 .editor-tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
 }
 
 .tool-btn {
@@ -731,7 +733,7 @@ html, body {
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 700;
-  padding: 9px 12px;
+  padding: 8px 10px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
