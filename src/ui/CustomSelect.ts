@@ -107,18 +107,24 @@ export class CustomSelect {
   }
 
   private open() {
-    // Fecha todos os outros dropdowns abertos
+    // Fecha todos os outros dropdowns abertos e limpa classes
     document.querySelectorAll('.custom-select-wrapper.open').forEach((el) => {
       el.classList.remove('open');
+      el.closest('.control-field')?.classList.remove('dropdown-active');
+      el.closest('.info-card')?.classList.remove('dropdown-active');
     });
 
     this.isOpen = true;
     this.customWrapper.classList.add('open');
+    this.customWrapper.closest('.control-field')?.classList.add('dropdown-active');
+    this.customWrapper.closest('.info-card')?.classList.add('dropdown-active');
   }
 
   private close() {
     this.isOpen = false;
     this.customWrapper.classList.remove('open');
+    this.customWrapper.closest('.control-field')?.classList.remove('dropdown-active');
+    this.customWrapper.closest('.info-card')?.classList.remove('dropdown-active');
   }
 
   private toggle() {
