@@ -58,6 +58,7 @@ export class Game {
   public achievementManager: AchievementManager;
   public leaderboardService: LeaderboardService;
   private matrixRain: MatrixRainEffect;
+  private attractOverlayEl: HTMLElement | null = null;
 
   public state: GameState = GameState.ATTRACT;
   public level: number = 1;
@@ -750,38 +751,43 @@ export class Game {
 
     if (this.state === GameState.ATTRACT) {
       this.renderAttractScreen();
-    } else if (this.state === GameState.READY) {
-      this.ctx.save();
-      ctxFormatText(
-        this.ctx,
-        'READY!',
-        INTERNAL_WIDTH / 2,
-        20 * 8,
-        '#FFFF00',
-        'bold 10px monospace'
-      );
-      this.ctx.restore();
-    } else if (this.state === GameState.GAME_OVER) {
-      this.ctx.save();
-      const overText =
-        this.gameMode === GameMode.GHOST_HUNTER ? 'HUNTER WIN!' : 'GAME  OVER';
-      ctxFormatText(
-        this.ctx,
-        overText,
-        INTERNAL_WIDTH / 2,
-        20 * 8,
-        '#FF0000',
-        'bold 10px monospace'
-      );
-      ctxFormatText(
-        this.ctx,
-        'PRESS SPACE TO PLAY',
-        INTERNAL_WIDTH / 2,
-        23 * 8,
-        '#FFFFFF',
-        '8px monospace'
-      );
-      this.ctx.restore();
+    } else {
+      if (this.attractOverlayEl) {
+        this.attractOverlayEl.style.display = 'none';
+      }
+      if (this.state === GameState.READY) {
+        this.ctx.save();
+        ctxFormatText(
+          this.ctx,
+          'READY!',
+          INTERNAL_WIDTH / 2,
+          20 * 8,
+          '#FFFF00',
+          'bold 10px monospace'
+        );
+        this.ctx.restore();
+      } else if (this.state === GameState.GAME_OVER) {
+        this.ctx.save();
+        const overText =
+          this.gameMode === GameMode.GHOST_HUNTER ? 'HUNTER WIN!' : 'GAME  OVER';
+        ctxFormatText(
+          this.ctx,
+          overText,
+          INTERNAL_WIDTH / 2,
+          20 * 8,
+          '#FF0000',
+          'bold 10px monospace'
+        );
+        ctxFormatText(
+          this.ctx,
+          'PRESS SPACE TO PLAY',
+          INTERNAL_WIDTH / 2,
+          23 * 8,
+          '#FFFFFF',
+          '8px monospace'
+        );
+        this.ctx.restore();
+      }
     }
 
     if (this.isGamePaused) {
@@ -812,112 +818,71 @@ export class Game {
 
   private renderAttractScreen() {
     this.ctx.save();
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.88)';
     this.ctx.fillRect(0, 0, INTERNAL_WIDTH, INTERNAL_HEIGHT);
+    this.ctx.restore();
 
-    let titleText = 'PAC-MAN';
-    let titleColor = '#FFE600';
-
-    if (this.gameMode === GameMode.GHOST_HUNTER) {
-      titleText = 'GHOST HUNTER';
-      titleColor = '#FF3333';
-    } else if (this.gameMode === GameMode.COOP_2P) {
-      titleText = 'PAC & MS. PAC';
-      titleColor = '#FF69B4';
-    } else if (this.gameMode === GameMode.TURBO) {
-      titleText = '⚡ TURBO PAC ⚡';
-      titleColor = '#FF5500';
+    if (!this.attractOverlayEl) {
+      this.attractOverlayEl = document.getElementById('gameAttractOverlay');
     }
 
-    ctxFormatText(
-      this.ctx,
-      titleText,
-      INTERNAL_WIDTH / 2,
-      42,
-      titleColor,
-      'bold 13px "Chakra Petch", sans-serif'
-    );
+    if (this.attractOverlayEl) {
+      this.attractOverlayEl.style.display = 'flex';
 
-    ctxFormatText(
-      this.ctx,
-      'CHARACTER / NICKNAME',
-      INTERNAL_WIDTH / 2,
-      72,
-      '#FFFFFF',
-      'bold 9px "Chakra Petch", sans-serif'
-    );
+      let titleText = 'PAC-MAN';
+      let titleColor = '#FFE600';
 
-    const ghostInfo = [
-      { nick: '-SHADOW', name: '"BLINKY"', color: '#FF3333', y: 96 },
-      { nick: '-SPEEDY', name: '"PINKY"', color: '#FFB8FF', y: 118 },
-      { nick: '-BASHFUL', name: '"INKY"', color: '#00FFFF', y: 140 },
-      { nick: '-POKEY', name: '"CLYDE"', color: '#FFA726', y: 162 },
-    ];
+      if (this.gameMode === GameMode.GHOST_HUNTER) {
+        titleText = '👻 GHOST HUNTER';
+        titleColor = '#FF3333';
+      } else if (this.gameMode === GameMode.COOP_2P) {
+        titleText = '👥 PAC & MS. PAC';
+        titleColor = '#FF69B4';
+      } else if (this.gameMode === GameMode.TURBO) {
+        titleText = '⚡ TURBO PAC ⚡';
+        titleColor = '#FF5500';
+      }
 
-    ghostInfo.forEach((info) => {
-      // Fantasma / ponto
-      this.ctx.fillStyle = info.color;
-      this.ctx.beginPath();
-      this.ctx.arc(32, info.y, 5, 0, Math.PI * 2);
-      this.ctx.fill();
+      this.attractOverlayEl.innerHTML = `
+        <div class="overlay-main-title" style="color: ${titleColor};">${titleText}</div>
+        <div class="overlay-section-label">CHARACTER / NICKNAME</div>
 
-      // Apelido
-      this.ctx.fillStyle = info.color;
-      this.ctx.font = 'bold 9px "Chakra Petch", sans-serif';
-      this.ctx.textAlign = 'left';
-      this.ctx.fillText(info.nick, 45, info.y + 3);
+        <div class="overlay-ghost-table">
+          <div class="overlay-ghost-row" style="color: #FF3333;">
+            <span class="overlay-ghost-dot" style="background: #FF3333;"></span>
+            <span class="overlay-ghost-nick">-SHADOW</span>
+            <span class="overlay-ghost-name">"BLINKY"</span>
+          </div>
+          <div class="overlay-ghost-row" style="color: #FFB8FF;">
+            <span class="overlay-ghost-dot" style="background: #FFB8FF;"></span>
+            <span class="overlay-ghost-nick">-SPEEDY</span>
+            <span class="overlay-ghost-name">"PINKY"</span>
+          </div>
+          <div class="overlay-ghost-row" style="color: #00FFFF;">
+            <span class="overlay-ghost-dot" style="background: #00FFFF;"></span>
+            <span class="overlay-ghost-nick">-BASHFUL</span>
+            <span class="overlay-ghost-name">"INKY"</span>
+          </div>
+          <div class="overlay-ghost-row" style="color: #FFA726;">
+            <span class="overlay-ghost-dot" style="background: #FFA726;"></span>
+            <span class="overlay-ghost-nick">-POKEY</span>
+            <span class="overlay-ghost-name">"CLYDE"</span>
+          </div>
+        </div>
 
-      // Nome do Fantasma
-      this.ctx.fillStyle = info.color;
-      this.ctx.fillText(info.name, 118, info.y + 3);
-    });
+        <div class="overlay-points-banner">🟡 10 PTS &nbsp;•&nbsp; ⚪ 50 PTS</div>
 
-    ctxFormatText(
-      this.ctx,
-      '10 PTS  -  50 PTS',
-      INTERNAL_WIDTH / 2,
-      192,
-      '#FFD700',
-      'bold 9px "Chakra Petch", sans-serif'
-    );
+        <div class="overlay-start-prompt">
+          <div class="overlay-start-text">PRESSIONE ESPAÇO / TOQUE</div>
+          <div class="overlay-start-sub">PARA COMEÇAR</div>
+        </div>
 
-    ctxFormatText(
-      this.ctx,
-      'PRESSIONE ESPAÇO / TOQUE',
-      INTERNAL_WIDTH / 2,
-      222,
-      '#00FF66',
-      'bold 10px "Chakra Petch", sans-serif'
-    );
-
-    ctxFormatText(
-      this.ctx,
-      'PARA COMEÇAR',
-      INTERNAL_WIDTH / 2,
-      237,
-      '#00FF66',
-      'bold 10px "Chakra Petch", sans-serif'
-    );
-
-    ctxFormatText(
-      this.ctx,
-      'P1: SETAS  |  P2: WASD',
-      INTERNAL_WIDTH / 2,
-      262,
-      '#CCCCCC',
-      'bold 8px "Chakra Petch", sans-serif'
-    );
-
-    ctxFormatText(
-      this.ctx,
-      'M: SOM  |  P: PAUSA  |  H: DEBUG',
-      INTERNAL_WIDTH / 2,
-      274,
-      '#AAAAAA',
-      'bold 8px "Chakra Petch", sans-serif'
-    );
-
-    this.ctx.restore();
+        <div class="overlay-footer-keys">
+          <div>P1: SETAS &nbsp;|&nbsp; P2: WASD</div>
+          <div style="color: #a5a5cc; font-size: 11px; margin-top: 3px;">M: SOM &nbsp;|&nbsp; P: PAUSA &nbsp;|&nbsp; H: DEBUG</div>
+        </div>
+      `;
+    }
   }
 
   public getInputManager(): InputManager {

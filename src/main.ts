@@ -7,6 +7,7 @@ import { MapEditor } from './map/MapEditor.ts';
 import { ShopModal } from './ui/ShopModal.ts';
 import { AchievementsModal } from './ui/AchievementsModal.ts';
 import { LeaderboardModal } from './ui/LeaderboardModal.ts';
+import { CustomSelect } from './ui/CustomSelect.ts';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -100,57 +101,53 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 3. Seletor de Modos de Jogo, Mapas, Temas e Skins
-  const modeSelect = document.getElementById('modeSelect') as HTMLSelectElement;
-  modeSelect?.addEventListener('change', () => {
-    const selectedMode = modeSelect.value as GameMode;
-    game.setGameMode(selectedMode);
+  // 3. Seletor de Modos de Jogo, Mapas, Temas e Skins Customizados
+  new CustomSelect('modeSelect', (val) => {
+    game.setGameMode(val as GameMode);
   });
 
-  const mapSelect = document.getElementById('mapSelect') as HTMLSelectElement;
-  mapSelect?.addEventListener('change', () => {
-    const selectedId = mapSelect.value;
-    const preset = MAP_PRESETS.find((p) => p.id === selectedId);
+  const customMapSelect = new CustomSelect('mapSelect', (val) => {
+    const preset = MAP_PRESETS.find((p) => p.id === val);
     if (preset) {
       game.loadMap(preset);
     }
   });
 
-  const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
-  if (themeSelect) {
-    themeSelect.value = game.themeManager.getTheme().id;
-    themeSelect.addEventListener('change', () => {
-      const selectedTheme = themeSelect.value as ThemeType;
-      game.setTheme(selectedTheme);
-    });
-  }
+  new CustomSelect('themeSelect', (val) => {
+    game.setTheme(val as ThemeType);
+  });
 
-  const skinSelect = document.getElementById('skinSelect') as HTMLSelectElement;
-  if (skinSelect) {
-    skinSelect.value = game.themeManager.getSkin();
-    skinSelect.addEventListener('change', () => {
-      const selectedSkin = skinSelect.value as PacmanSkin;
-      // Checa se está desbloqueada na loja
-      if (game.economyService.isSkinUnlocked(selectedSkin)) {
-        game.setPacmanSkin(selectedSkin);
-      } else {
-        alert('Essa skin ainda está bloqueada! Desbloqueie na Lojinha de Upgrades com moedas.');
-        shopModal.open();
-        skinSelect.value = game.themeManager.getSkin();
-      }
-    });
-  }
+  const customSkinSelect = new CustomSelect('skinSelect', (val) => {
+    const selectedSkin = val as PacmanSkin;
+    if (game.economyService.isSkinUnlocked(selectedSkin)) {
+      game.setPacmanSkin(selectedSkin);
+    } else {
+      alert('Essa skin ainda está bloqueada! Desbloqueie na Lojinha de Upgrades com moedas.');
+      shopModal.open();
+      customSkinSelect.setValue(game.themeManager.getSkin());
+    }
+  });
+
+  // Mantém os selects sincronizados ao equipar skins via lojinha
+  shopModal.onSkinEquipped((skin) => {
+    game.setPacmanSkin(skin);
+    customSkinSelect.setValue(skin);
+  });
 
   // 4. Gerador Procedural
+  const nativeMapSelect = document.getElementById('mapSelect') as HTMLSelectElement;
   const btnProcedural = document.getElementById('btnProcedural');
   btnProcedural?.addEventListener('click', () => {
     const randomMap = ProceduralGenerator.generate();
-    const opt = document.createElement('option');
-    opt.value = randomMap.id;
-    opt.innerText = randomMap.name;
-    opt.selected = true;
-    mapSelect.appendChild(opt);
-
+    if (nativeMapSelect) {
+      const opt = document.createElement('option');
+      opt.value = randomMap.id;
+      opt.innerText = randomMap.name;
+      opt.selected = true;
+      nativeMapSelect.appendChild(opt);
+      customMapSelect.render();
+      customMapSelect.setValue(randomMap.id);
+    }
     game.loadMap(randomMap);
   });
 
@@ -165,12 +162,15 @@ window.addEventListener('DOMContentLoaded', () => {
     mapEditor = new MapEditor(editorCanvas);
     mapEditor.setOnPlay((config: MapConfig) => {
       editorModal?.classList.remove('open');
-      const opt = document.createElement('option');
-      opt.value = config.id;
-      opt.innerText = config.name;
-      opt.selected = true;
-      mapSelect.appendChild(opt);
-
+      if (nativeMapSelect) {
+        const opt = document.createElement('option');
+        opt.value = config.id;
+        opt.innerText = config.name;
+        opt.selected = true;
+        nativeMapSelect.appendChild(opt);
+        customMapSelect.render();
+        customMapSelect.setValue(config.id);
+      }
       game.loadMap(config);
     });
   }
