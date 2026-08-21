@@ -812,97 +812,109 @@ export class Game {
 
   private renderAttractScreen() {
     this.ctx.save();
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.88)';
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.92)';
     this.ctx.fillRect(0, 0, INTERNAL_WIDTH, INTERNAL_HEIGHT);
 
     let titleText = 'PAC-MAN';
-    let titleColor = '#FFFF00';
+    let titleColor = '#FFE600';
 
     if (this.gameMode === GameMode.GHOST_HUNTER) {
       titleText = 'GHOST HUNTER';
-      titleColor = '#FF0000';
+      titleColor = '#FF3333';
     } else if (this.gameMode === GameMode.COOP_2P) {
       titleText = 'PAC & MS. PAC';
       titleColor = '#FF69B4';
     } else if (this.gameMode === GameMode.TURBO) {
       titleText = '⚡ TURBO PAC ⚡';
-      titleColor = '#FF3D00';
+      titleColor = '#FF5500';
     }
 
     ctxFormatText(
       this.ctx,
       titleText,
       INTERNAL_WIDTH / 2,
-      45,
+      42,
       titleColor,
-      'bold 14px "Courier New", monospace'
+      'bold 13px "Chakra Petch", sans-serif'
     );
+
     ctxFormatText(
       this.ctx,
       'CHARACTER / NICKNAME',
       INTERNAL_WIDTH / 2,
-      75,
+      72,
       '#FFFFFF',
-      'bold 8px monospace'
+      'bold 9px "Chakra Petch", sans-serif'
     );
 
     const ghostInfo = [
-      { name: '-SHADOW  "BLINKY"', color: '#FF0000', y: 95 },
-      { name: '-SPEEDY  "PINKY"', color: '#FFB8FF', y: 115 },
-      { name: '-BASHFUL "INKY"', color: '#00FFFF', y: 135 },
-      { name: '-POKEY   "CLYDE"', color: '#FFA726', y: 155 },
+      { nick: '-SHADOW', name: '"BLINKY"', color: '#FF3333', y: 96 },
+      { nick: '-SPEEDY', name: '"PINKY"', color: '#FFB8FF', y: 118 },
+      { nick: '-BASHFUL', name: '"INKY"', color: '#00FFFF', y: 140 },
+      { nick: '-POKEY', name: '"CLYDE"', color: '#FFA726', y: 162 },
     ];
 
     ghostInfo.forEach((info) => {
+      // Fantasma / ponto
       this.ctx.fillStyle = info.color;
       this.ctx.beginPath();
-      this.ctx.arc(35, info.y, 5, 0, Math.PI * 2);
+      this.ctx.arc(32, info.y, 5, 0, Math.PI * 2);
       this.ctx.fill();
 
-      this.ctx.font = 'bold 8px "Courier New", monospace';
+      // Apelido
+      this.ctx.fillStyle = info.color;
+      this.ctx.font = 'bold 9px "Chakra Petch", sans-serif';
       this.ctx.textAlign = 'left';
-      this.ctx.fillText(info.name, 48, info.y + 3);
+      this.ctx.fillText(info.nick, 45, info.y + 3);
+
+      // Nome do Fantasma
+      this.ctx.fillStyle = info.color;
+      this.ctx.fillText(info.name, 118, info.y + 3);
     });
 
     ctxFormatText(
       this.ctx,
-      '10 PTS  - 50 PTS',
+      '10 PTS  -  50 PTS',
       INTERNAL_WIDTH / 2,
-      190,
-      '#FFB8AE',
-      '8px monospace'
+      192,
+      '#FFD700',
+      'bold 9px "Chakra Petch", sans-serif'
     );
+
     ctxFormatText(
       this.ctx,
-      'PRESS SPACE / TOUCH',
+      'PRESSIONE ESPAÇO / TOQUE',
       INTERNAL_WIDTH / 2,
-      220,
-      '#00FF00',
-      'bold 9px monospace'
+      222,
+      '#00FF66',
+      'bold 10px "Chakra Petch", sans-serif'
     );
+
     ctxFormatText(
       this.ctx,
-      'TO START',
+      'PARA COMEÇAR',
       INTERNAL_WIDTH / 2,
-      235,
-      '#00FF00',
-      'bold 9px monospace'
+      237,
+      '#00FF66',
+      'bold 10px "Chakra Petch", sans-serif'
     );
+
     ctxFormatText(
       this.ctx,
-      'P1: ARROWS | P2: WASD',
+      'P1: SETAS  |  P2: WASD',
       INTERNAL_WIDTH / 2,
-      260,
+      262,
+      '#CCCCCC',
+      'bold 8px "Chakra Petch", sans-serif'
+    );
+
+    ctxFormatText(
+      this.ctx,
+      'M: SOM  |  P: PAUSA  |  H: DEBUG',
+      INTERNAL_WIDTH / 2,
+      274,
       '#AAAAAA',
-      '7px monospace'
-    );
-    ctxFormatText(
-      this.ctx,
-      'M: MUTE | P: PAUSE | H: DEBUG',
-      INTERNAL_WIDTH / 2,
-      272,
-      '#AAAAAA',
-      '7px monospace'
+      'bold 8px "Chakra Petch", sans-serif'
     );
 
     this.ctx.restore();

@@ -1,16 +1,23 @@
 :root {
   --arcade-black: #000000;
   --arcade-blue: #2121de;
-  --pacman-yellow: #ffff00;
-  --ghost-red: #ff0000;
+  --pacman-yellow: #ffe600;
+  --ghost-red: #ff3333;
   --ghost-pink: #ffb8ff;
   --ghost-cyan: #00ffff;
-  --ghost-orange: #ffb852;
-  --bg-dark: #070714;
-  --panel-bg: #121226;
-  --panel-border: #2c2c54;
-  --neon-cyan: #00ffff;
-  --neon-magenta: #ff007f;
+  --ghost-orange: #ffa726;
+  
+  /* Next Automatik Purple Glassmorphism Design System */
+  --na-bg-dark: #080412;
+  --na-purple-deep: #140826;
+  --na-purple-card: rgba(26, 12, 50, 0.72);
+  --na-purple-border: rgba(168, 85, 247, 0.32);
+  --na-purple-border-hover: rgba(192, 132, 252, 0.7);
+  --na-purple-glow: rgba(168, 85, 247, 0.4);
+  --na-purple-light: #d8b4fe;
+  --na-purple-text: #f3e8ff;
+  --na-purple-muted: #a89ec4;
+  
   --font-arcade: 'Press Start 2P', monospace;
   --font-ui: 'Chakra Petch', system-ui, -apple-system, sans-serif;
 }
@@ -22,36 +29,37 @@
   user-select: none;
 }
 
-/* Barra de rolagem estilizada */
+/* Barra de rolagem estilizada roxa */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(10, 10, 25, 0.7);
+  background: rgba(12, 6, 24, 0.8);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #00ffff;
+  background: #a855f7;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff00ea;
+  background: #c084fc;
 }
 
 html, body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: var(--bg-dark);
+  background-color: var(--na-bg-dark);
+  background: radial-gradient(circle at 50% 15%, #230d42 0%, #0d051c 65%, #05020a 100%);
   font-family: var(--font-ui);
-  color: #ffffff;
-  font-size: 15px; /* Fonte base nítida e confortável */
+  color: var(--na-purple-text);
+  font-size: 15px;
   letter-spacing: 0.5px;
 }
 
 /* =========================================================================
- * 🕹️ LAYOUT PRINCIPAL DE 3 COLUNAS
+ * 🕹️ LAYOUT PRINCIPAL (3 Colunas com Glassmorphism)
  * ========================================================================= */
 .main-layout {
   display: grid;
@@ -72,26 +80,34 @@ html, body {
   padding-right: 4px;
 }
 
-/* Cards dos Painéis */
+/* Cards dos Painéis com Efeito de Vidro (Glassmorphism Roxo) */
 .info-card {
-  background: var(--panel-bg);
-  border: 2px solid var(--panel-border);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-  border-radius: 10px;
-  padding: 12px 14px;
+  background: var(--na-purple-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid var(--na-purple-border);
+  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.info-card:hover {
+  border-color: var(--na-purple-border-hover);
+  box-shadow: 0 8px 30px 0 rgba(168, 85, 247, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
 .info-card-title {
   font-family: var(--font-arcade);
-  font-size: 13px;
-  color: var(--neon-cyan);
+  font-size: 12px;
+  color: var(--na-purple-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #252548;
+  border-bottom: 1.5px solid rgba(168, 85, 247, 0.25);
   padding-bottom: 8px;
   letter-spacing: 1px;
 }
@@ -106,19 +122,19 @@ html, body {
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 700;
-  color: #a5a5cc;
+  color: var(--na-purple-muted);
   text-transform: uppercase;
 }
 
 .map-select {
-  background: #090916;
-  border: 2px solid #3c3c66;
+  background: rgba(14, 6, 30, 0.85);
+  border: 1.5px solid var(--na-purple-border);
   color: #ffffff;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 600;
   padding: 9px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   outline: none;
   cursor: pointer;
   width: 100%;
@@ -126,8 +142,8 @@ html, body {
 }
 
 .map-select:focus {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  border-color: #c084fc;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
 }
 
 .button-grid {
@@ -137,34 +153,35 @@ html, body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #00f0ff 0%, #0077b6 100%);
-  color: #000000;
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #6366f1 100%);
+  color: #ffffff;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 800;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 10px 14px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.35);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.7);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: #1c1c38;
-  color: #c0c0e8;
+  background: rgba(42, 18, 78, 0.65);
+  color: #e9d5ff;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 700;
-  border: 1.5px solid #3e3e68;
-  border-radius: 6px;
+  border: 1.5px solid var(--na-purple-border);
+  border-radius: 8px;
   padding: 10px 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -172,20 +189,20 @@ html, body {
 }
 
 .btn-secondary:hover {
-  background: #2b2b52;
+  background: rgba(62, 28, 115, 0.85);
   color: #ffffff;
-  border-color: #00ffff;
+  border-color: #c084fc;
 }
 
 .action-btn {
-  background: #16162e;
-  border: 1.5px solid #34345c;
-  color: #ffffff;
+  background: rgba(32, 14, 62, 0.65);
+  border: 1.5px solid var(--na-purple-border);
+  color: #f3e8ff;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 700;
   padding: 10px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   text-align: left;
   transition: all 0.2s ease;
@@ -195,18 +212,19 @@ html, body {
 }
 
 .action-btn:hover {
-  background: #24244a;
-  border-color: var(--neon-cyan);
+  background: rgba(52, 24, 98, 0.8);
+  border-color: #c084fc;
 }
 
 .action-btn.active {
-  background: #004d40;
-  border-color: #00e676;
-  color: #69f0ae;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border-color: #e9d5ff;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
 }
 
 /* =========================================================================
- * 🟡 GABINETE ARCADE CENTRAL
+ * 🟡 GABINETE ARCADE CENTRAL & TÍTULO NÍTIDO
  * ========================================================================= */
 .arcade-center-panel {
   display: flex;
@@ -224,12 +242,13 @@ html, body {
   margin-bottom: 8px;
 }
 
+/* Título Pac-Man Nítido com Sombra Sólida Sem Borrão */
 .arcade-title {
   font-family: var(--font-arcade);
   color: var(--pacman-yellow);
-  font-size: 2.2rem;
-  letter-spacing: 6px;
-  text-shadow: 0 0 15px rgba(255, 255, 0, 0.9), 0 0 30px rgba(255, 184, 0, 0.6);
+  font-size: 2.1rem;
+  letter-spacing: 5px;
+  text-shadow: 3px 3px 0px #7c3aed, 0 0 12px rgba(255, 230, 0, 0.4);
 }
 
 .cabinet-bezel {
@@ -237,8 +256,8 @@ html, body {
   aspect-ratio: 224 / 288;
   max-width: 100%;
   background: #000000;
-  border: 4px solid #2121de;
-  box-shadow: 0 0 0 4px #000, 0 0 35px rgba(33, 33, 222, 0.5), 0 15px 50px rgba(0, 0, 0, 0.95);
+  border: 3.5px solid #2121de;
+  box-shadow: 0 0 0 3px #000, 0 0 35px rgba(124, 58, 237, 0.45), 0 15px 50px rgba(0, 0, 0, 0.95);
   border-radius: 14px;
   overflow: hidden;
   position: relative;
@@ -260,19 +279,20 @@ html, body {
   image-rendering: pixelated;
 }
 
+/* CRT Scanlines Suaves para não borrifar nem cortar o texto */
 .scanlines-on::after {
   content: " ";
   display: block;
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
-  background-size: 100% 4px;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
+  background-size: 100% 3px;
   z-index: 2;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.25;
 }
 
-/* Informações de Fantasmas, Power-ups e Controles */
+/* Fantasmas, Power-ups e Controles */
 .ghost-list, .controls-list {
   display: flex;
   flex-direction: column;
@@ -302,28 +322,28 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #b0b0d8;
+  color: var(--na-purple-muted);
 }
 
 .key-tag {
-  background: #1c1c34;
+  background: rgba(36, 16, 70, 0.85);
   color: var(--pacman-yellow);
   padding: 3px 8px;
   border-radius: 4px;
-  border: 1px solid #444470;
+  border: 1px solid var(--na-purple-border);
   font-size: 12px;
   font-weight: 700;
 }
 
 /* =========================================================================
- * 🏆 MODAIS DE JOGO (Conquistas, Lojinha, Recordes, Editor)
+ * 🏆 MODAIS COM VIDRO ROXO GLASSMORPHISM
  * ========================================================================= */
 .editor-modal {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(3, 3, 10, 0.92);
-  backdrop-filter: blur(14px);
+  background: rgba(6, 2, 14, 0.88);
+  backdrop-filter: blur(16px);
   z-index: 200;
   align-items: center;
   justify-content: center;
@@ -335,9 +355,11 @@ html, body {
 }
 
 .editor-content {
-  background: #0f0f22;
-  border: 2px solid #2121de;
-  box-shadow: 0 0 45px rgba(33, 33, 222, 0.4), 0 20px 60px rgba(0, 0, 0, 0.95);
+  background: rgba(20, 9, 40, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 45px rgba(124, 58, 237, 0.35), 0 20px 60px rgba(0, 0, 0, 0.95);
   border-radius: 14px;
   padding: 20px;
   width: 100%;
@@ -366,13 +388,13 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1.5px solid rgba(168, 85, 247, 0.25);
   padding-bottom: 12px;
 }
 
 .editor-title {
   font-family: var(--font-arcade);
-  color: #ffff00;
+  color: var(--pacman-yellow);
   font-size: 1.1rem;
   letter-spacing: 2px;
 }
@@ -404,22 +426,22 @@ html, body {
 }
 
 /* =========================================================================
- * 🌟 CARDS DE CONQUISTAS GRANDES, ESPAÇOSOS E 100% LEGÍVEIS
+ * 🌟 CARDS DE CONQUISTAS ESPAÇOSOS E ROXOS
  * ========================================================================= */
 .achievement-filters {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1.5px solid rgba(168, 85, 247, 0.2);
   padding-bottom: 12px;
 }
 
 .ach-filter-btn, .shop-tab-btn {
-  background: #181832;
-  border: 1.5px solid #383860;
-  color: #b0b0d8;
+  background: rgba(34, 15, 66, 0.7);
+  border: 1.5px solid var(--na-purple-border);
+  color: var(--na-purple-muted);
   padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 700;
@@ -428,19 +450,18 @@ html, body {
 }
 
 .ach-filter-btn:hover, .shop-tab-btn:hover {
-  background: #282852;
+  background: rgba(54, 24, 102, 0.9);
   color: #ffffff;
 }
 
 .ach-filter-btn.active, .shop-tab-btn.active {
-  background: #00ffff;
-  color: #000000;
-  border-color: #00ffff;
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  color: #ffffff;
+  border-color: #d8b4fe;
   font-weight: 900;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
 }
 
-/* Grid Espaçoso (Cards de 300px+) */
 .achievements-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -448,8 +469,8 @@ html, body {
 }
 
 .ach-card-spacious {
-  background: #14142a;
-  border: 2px solid #2c2c54;
+  background: rgba(28, 13, 56, 0.75);
+  border: 1.5px solid var(--na-purple-border);
   border-radius: 10px;
   padding: 14px;
   display: flex;
@@ -459,8 +480,8 @@ html, body {
 }
 
 .ach-card-spacious:hover {
-  border-color: #00ffff;
-  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.15);
+  border-color: #c084fc;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.25);
   transform: translateY(-2px);
 }
 
@@ -470,8 +491,8 @@ html, body {
 
 .ach-card-spacious.card-mastered {
   border-color: #ffd700;
-  background: rgba(255, 215, 0, 0.06);
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+  background: rgba(255, 215, 0, 0.08);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.25);
 }
 
 .ach-card-top {
@@ -506,7 +527,7 @@ html, body {
 .ach-card-cat-label {
   font-size: 11px;
   font-weight: 700;
-  color: #8888b4;
+  color: var(--na-purple-light);
   letter-spacing: 0.5px;
 }
 
@@ -525,13 +546,13 @@ html, body {
 }
 
 .ach-big-star.dim {
-  color: #38385c;
+  color: #4a2d7a;
 }
 
 .ach-card-middle {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
+  background: rgba(10, 4, 22, 0.5);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  border-radius: 8px;
   padding: 8px 10px;
 }
 
@@ -544,14 +565,14 @@ html, body {
 .ach-tier-tag {
   font-size: 11px;
   font-weight: 800;
-  color: #00ffff;
+  color: #d8b4fe;
   text-transform: uppercase;
 }
 
 .ach-mission-goal {
   font-size: 14px;
   font-weight: 600;
-  color: #e0e0ff;
+  color: #f3e8ff;
   line-height: 1.35;
 }
 
@@ -574,11 +595,11 @@ html, body {
   height: 8px;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid rgba(0, 255, 255, 0.25);
+  border: 1px solid rgba(168, 85, 247, 0.3);
 }
 
 .ach-bar-fill {
-  background: linear-gradient(90deg, #00ffff, #ff00ea);
+  background: linear-gradient(90deg, #a855f7, #ec4899);
   height: 100%;
 }
 
@@ -591,7 +612,7 @@ html, body {
 .ach-bar-numbers {
   font-size: 13px;
   font-weight: 700;
-  color: #c0c0e8;
+  color: var(--na-purple-light);
 }
 
 .ach-reward-tag {
@@ -605,12 +626,12 @@ html, body {
 }
 
 /* =========================================================================
- * 🏪 LOJINHA DE UPGRADES E SKINS
+ * 🏪 LOJINHA DE UPGRADES & SKINS
  * ========================================================================= */
 .shop-tabs-nav {
   display: flex;
   gap: 10px;
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1.5px solid rgba(168, 85, 247, 0.2);
   padding-bottom: 12px;
 }
 
@@ -622,8 +643,8 @@ html, body {
 }
 
 .shop-card {
-  background: #14142a;
-  border: 2px solid #2c2c54;
+  background: rgba(28, 13, 56, 0.75);
+  border: 1.5px solid var(--na-purple-border);
   border-radius: 10px;
   padding: 16px;
   display: flex;
@@ -633,12 +654,12 @@ html, body {
 
 .shop-card.mastered {
   border-color: #ffd700;
-  background: rgba(255, 215, 0, 0.05);
+  background: rgba(255, 215, 0, 0.08);
 }
 
 .shop-card.equipped {
   border-color: #00e676;
-  background: rgba(0, 230, 118, 0.06);
+  background: rgba(0, 230, 118, 0.08);
 }
 
 .shop-card-header {
@@ -664,7 +685,7 @@ html, body {
 .shop-card-level-badge {
   font-size: 13px;
   font-weight: 700;
-  color: var(--neon-cyan);
+  color: var(--na-purple-light);
   margin-top: 2px;
 }
 
@@ -678,7 +699,7 @@ html, body {
 .shop-card-desc {
   font-size: 14px;
   font-weight: 500;
-  color: #a8a8cc;
+  color: var(--na-purple-muted);
   line-height: 1.4;
 }
 
@@ -697,11 +718,11 @@ html, body {
   height: 8px;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid rgba(0, 255, 255, 0.25);
+  border: 1px solid rgba(168, 85, 247, 0.3);
 }
 
 .shop-progress-fill {
-  background: linear-gradient(90deg, #00f0ff, #ff007f);
+  background: linear-gradient(90deg, #a855f7, #ec4899);
   height: 100%;
 }
 
@@ -710,7 +731,7 @@ html, body {
   font-size: 14px;
   font-weight: 800;
   padding: 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   margin-top: auto;
@@ -719,19 +740,20 @@ html, body {
 }
 
 .btn-buy {
-  background: linear-gradient(135deg, #00f0ff 0%, #0088cc 100%);
-  color: #000000;
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
 }
 .btn-buy:hover {
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.7);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
 }
 
 .btn-equip {
-  background: #ff007f;
+  background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);
   color: #ffffff;
 }
 .btn-equip:hover {
-  box-shadow: 0 0 15px rgba(255, 0, 127, 0.7);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.7);
 }
 
 .btn-equipped {
@@ -747,8 +769,8 @@ html, body {
 }
 
 .btn-disabled {
-  background: #22223a;
-  color: #666688;
+  background: rgba(40, 20, 75, 0.6);
+  color: #7a6a96;
   cursor: not-allowed;
 }
 
@@ -758,7 +780,7 @@ html, body {
   top: 20px;
   left: 50%;
   transform: translateX(-50%) translateY(-100px);
-  background: rgba(14, 14, 30, 0.98);
+  background: rgba(22, 10, 44, 0.98);
   border: 2px solid #ffd700;
   box-shadow: 0 0 35px rgba(255, 215, 0, 0.6);
   border-radius: 12px;
@@ -808,7 +830,7 @@ html, body {
 }
 
 .leaderboard-table th {
-  border-bottom: 2px solid #33335c;
+  border-bottom: 2px solid rgba(168, 85, 247, 0.3);
   padding: 10px 8px;
   text-align: left;
   color: #ffd700;
@@ -818,43 +840,31 @@ html, body {
 
 .leaderboard-table td {
   padding: 10px 8px;
-  border-bottom: 1px solid #1c1c34;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.15);
 }
 
 /* Temas Visuais */
 body.theme-synthwave {
-  background-color: #0d001a;
-  background-image: 
-    radial-gradient(circle at 50% 30%, #2b0054 0%, #080014 80%),
-    linear-gradient(rgba(255, 0, 127, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+  background: radial-gradient(circle at 50% 20%, #300055 0%, #0d001a 75%, #05000c 100%);
 }
 body.theme-synthwave .arcade-title {
   color: #00ffff;
-  text-shadow: 0 0 15px #ff007f, 0 0 30px #00ffff;
+  text-shadow: 3px 3px 0px #ff007f, 0 0 15px #00ffff;
 }
 
 body.theme-matrix {
-  background-color: #020b04;
-  background-image: 
-    radial-gradient(circle at 50% 30%, #06240d 0%, #020b04 80%),
-    linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
+  background: radial-gradient(circle at 50% 20%, #06240d 0%, #020b04 75%, #000401 100%);
 }
 body.theme-matrix .arcade-title {
   color: #00ff66;
-  text-shadow: 0 0 15px #00ff66, 0 0 30px rgba(0, 255, 102, 0.6);
+  text-shadow: 3px 3px 0px #004d1a, 0 0 15px rgba(0, 255, 102, 0.7);
 }
 
 body.theme-gameboy {
-  background-color: #8bac0f;
-  background-image: none;
+  background: #8bac0f;
   color: #0f380f;
 }
 body.theme-gameboy .arcade-title {
   color: #0f380f;
   text-shadow: none;
-}
-body.theme-gameboy .cabinet-bezel {
-  background: #9bbc0f;
 }
