@@ -126,14 +126,22 @@ html, body {
   text-transform: uppercase;
 }
 
+/* Seletor Dropdown com Seta Simétrica & Sem Azul */
 .map-select {
-  background: rgba(14, 6, 30, 0.85);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: rgba(16, 7, 34, 0.9);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c084fc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
   border: 1.5px solid var(--na-purple-border);
   color: #ffffff;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 600;
-  padding: 9px 12px;
+  padding: 10px 38px 10px 14px; /* Espaçamento simétrico exato: 14px na esquerda e 14px na direita */
   border-radius: 8px;
   outline: none;
   cursor: pointer;
@@ -141,9 +149,29 @@ html, body {
   transition: all 0.2s ease;
 }
 
-.map-select:focus {
+.map-select:hover {
   border-color: #c084fc;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+}
+
+.map-select:focus {
+  border-color: #d8b4fe;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.55);
+}
+
+.map-select option {
+  background: #14072b;
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  padding: 10px 14px;
+}
+
+.map-select option:hover,
+.map-select option:focus,
+.map-select option:checked {
+  background: #7c3aed !important;
+  color: #ffffff !important;
 }
 
 .button-grid {
@@ -153,12 +181,12 @@ html, body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #6366f1 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 800;
-  border: none;
+  border: 1.5px solid #a855f7;
   border-radius: 8px;
   padding: 10px 14px;
   cursor: pointer;
@@ -166,12 +194,49 @@ html, body {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.35);
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.75);
+  border-color: #d8b4fe;
   transform: translateY(-1px);
+}
+
+/* Efeito de Brilho Dinâmico (Shimmer Gleam) para Botão de Destaque */
+.btn-shop-highlight {
+  background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%) !important;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid #c084fc !important;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.5) !important;
+}
+
+.btn-shop-highlight::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -70%;
+  width: 45%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(25deg);
+  animation: shimmerGleam 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes shimmerGleam {
+  0% {
+    left: -80%;
+  }
+  35%, 100% {
+    left: 170%;
+  }
 }
 
 .btn-secondary {
@@ -279,17 +344,17 @@ html, body {
   image-rendering: pixelated;
 }
 
-/* CRT Scanlines Suaves para não borrifar nem cortar o texto */
+/* CRT Scanlines Suaves para não cortar o texto */
 .scanlines-on::after {
   content: " ";
   display: block;
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
   background-size: 100% 3px;
   z-index: 2;
   pointer-events: none;
-  opacity: 0.25;
+  opacity: 0.2;
 }
 
 /* Fantasmas, Power-ups e Controles */
@@ -426,6 +491,95 @@ html, body {
 }
 
 /* =========================================================================
+ * 🛠️ ESTÚDIO DE LABIRINTOS (Layout Studio Moderno)
+ * ========================================================================= */
+.editor-studio-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.editor-canvas-box {
+  background: #000000;
+  border: 2.5px solid #7c3aed;
+  box-shadow: 0 0 25px rgba(124, 58, 237, 0.35);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#editorCanvas {
+  display: block;
+  image-rendering: pixelated;
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+}
+
+.editor-panel-controls {
+  background: rgba(24, 11, 48, 0.7);
+  border: 1.5px solid var(--na-purple-border);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editor-group-title {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--na-purple-light);
+  letter-spacing: 0.5px;
+}
+
+.editor-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  gap: 6px;
+}
+
+.tool-btn {
+  background: rgba(38, 16, 75, 0.7);
+  border: 1.5px solid var(--na-purple-border);
+  color: #e9d5ff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.tool-btn:hover {
+  background: rgba(58, 26, 115, 0.85);
+  border-color: #c084fc;
+  color: #ffffff;
+}
+
+.tool-btn.active {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border-color: #f3e8ff;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+}
+
+.editor-actions-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* =========================================================================
  * 🌟 CARDS DE CONQUISTAS ESPAÇOSOS E ROXOS
  * ========================================================================= */
 .achievement-filters {
@@ -455,7 +609,7 @@ html, body {
 }
 
 .ach-filter-btn.active, .shop-tab-btn.active {
-  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   border-color: #d8b4fe;
   font-weight: 900;
@@ -599,7 +753,7 @@ html, body {
 }
 
 .ach-bar-fill {
-  background: linear-gradient(90deg, #a855f7, #ec4899);
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
   height: 100%;
 }
 
@@ -722,7 +876,7 @@ html, body {
 }
 
 .shop-progress-fill {
-  background: linear-gradient(90deg, #a855f7, #ec4899);
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
   height: 100%;
 }
 
@@ -740,20 +894,23 @@ html, body {
 }
 
 .btn-buy {
-  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+  border: 1.5px solid #a855f7;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
 }
 .btn-buy:hover {
   box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  border-color: #d8b4fe;
 }
 
 .btn-equip {
-  background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
   color: #ffffff;
+  border: 1.5px solid #c084fc;
 }
 .btn-equip:hover {
-  box-shadow: 0 0 15px rgba(236, 72, 153, 0.7);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
 }
 
 .btn-equipped {

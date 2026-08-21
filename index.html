@@ -75,10 +75,10 @@
         <div class="info-card">
           <h2 class="info-card-title">
             <span>🌟 PROGRESSÃO</span>
-            <span id="headerCoinsCounter" style="color: #ffd700; font-size: 0.5rem;">0 🪙</span>
+            <span id="headerCoinsCounter" class="coins-pill" style="font-size: 13px; padding: 2px 8px;">0 🪙</span>
           </h2>
-          <button class="btn-primary" id="btnOpenShop" style="width: 100%;">🏪 LOJINHA DE UPGRADES</button>
-          <div class="button-grid" style="margin-top: 4px;">
+          <button class="btn-primary btn-shop-highlight" id="btnOpenShop" style="width: 100%;">🏪 LOJINHA DE UPGRADES</button>
+          <div class="button-grid" style="margin-top: 6px;">
             <button class="btn-secondary" id="btnOpenAchievements">🏆 Conquistas</button>
             <button class="btn-secondary" id="btnOpenLeaderboard">🥇 Recordes</button>
           </div>
@@ -102,7 +102,7 @@
       <aside class="arcade-side-panel">
         <div class="info-card">
           <h2 class="info-card-title">🕹️ AÇÕES RÁPIDAS</h2>
-          <div style="display: flex; flex-direction: column; gap: 5px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
             <button class="action-btn" id="btnPause">⏸️ Pausa [P]</button>
             <button class="action-btn" id="btnMute">🔊 Efeitos Som [M]</button>
             <button class="action-btn" id="btnSiren">🚨 Sirene: OFF [S]</button>
@@ -184,20 +184,20 @@
           <button class="editor-close" id="btnCloseNewRecord" aria-label="Fechar">&times;</button>
         </div>
         <div style="padding: 10px 0;">
-          <div style="font-size: 0.6rem; color: #8888b0; margin-bottom: 6px;">SUA PONTUAÇÃO FINAL:</div>
-          <div id="newRecordScoreText" style="font-size: 1.1rem; color: #00ff66; font-weight: bold; margin-bottom: 14px;">0 PONTOS</div>
+          <div style="font-size: 13px; color: #a5a5cc; margin-bottom: 6px;">SUA PONTUAÇÃO FINAL:</div>
+          <div id="newRecordScoreText" style="font-size: 24px; color: #00ff66; font-weight: bold; margin-bottom: 14px;">0 PONTOS</div>
           
-          <div style="font-size: 0.52rem; color: #ffffff; margin-bottom: 8px;">DIGITE SUAS 3 INICIAIS:</div>
+          <div style="font-size: 13px; color: #ffffff; margin-bottom: 8px;">DIGITE SUAS 3 INICIAIS:</div>
           <input 
             type="text" 
             id="inputInitials" 
             maxlength="3" 
             value="AAA" 
-            style="font-family: inherit; font-size: 1.4rem; letter-spacing: 10px; text-align: center; text-transform: uppercase; background: #000; color: #ffff00; border: 2px solid #00ffff; border-radius: 8px; padding: 10px; width: 140px; outline: none; margin-bottom: 14px;"
+            style="font-family: inherit; font-size: 1.8rem; letter-spacing: 12px; text-align: center; text-transform: uppercase; background: #000; color: #ffff00; border: 2px solid #a855f7; border-radius: 8px; padding: 10px; width: 160px; outline: none; margin-bottom: 14px;"
           />
 
           <div style="display: flex; gap: 8px; justify-content: center;">
-            <button class="btn-primary" id="btnSaveRecord" style="font-size: 0.6rem;">💾 SALVAR NO RANKING</button>
+            <button class="btn-primary" id="btnSaveRecord" style="font-size: 14px;">💾 SALVAR NO RANKING</button>
           </div>
         </div>
       </div>
@@ -208,7 +208,7 @@
       <div class="editor-content modal-wide">
         <div class="editor-header">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.1rem;">🏪</span>
+            <span style="font-size: 1.3rem;">🏪</span>
             <h2 class="editor-title">LOJINHA DO PAC-MAN</h2>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -226,7 +226,7 @@
       <div class="editor-content modal-fullscreen">
         <div class="editor-header">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.1rem;">🏆</span>
+            <span style="font-size: 1.3rem;">🏆</span>
             <h2 class="editor-title">CONQUISTAS PROGRESSIVAS</h2>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -267,33 +267,44 @@
     <div class="editor-modal" id="editorModal" aria-modal="true" role="dialog">
       <div class="editor-content modal-wide">
         <div class="editor-header">
-          <h2 class="editor-title">🛠️ EDITOR DE LABIRINTOS</h2>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.3rem;">🛠️</span>
+            <h2 class="editor-title">ESTÚDIO DE LABIRINTOS</h2>
+          </div>
           <button class="editor-close" id="btnCloseEditor" aria-label="Fechar">&times;</button>
         </div>
 
-        <div class="editor-body">
+        <div class="editor-studio-layout">
           <div class="editor-canvas-box">
             <canvas id="editorCanvas" width="224" height="288"></canvas>
           </div>
 
-          <div class="editor-tools">
-            <button class="tool-btn active" id="toolWall">🧱 Parede</button>
-            <button class="tool-btn" id="toolDot">🟡 Pastilha</button>
-            <button class="tool-btn" id="toolEnergizer">⚪ Energizer</button>
-            <button class="tool-btn" id="toolErase">🧹 Borracha</button>
-            <button class="tool-btn" id="toolTunnel">🌀 Túnel</button>
-            
-            <hr style="border: 0; border-top: 1px solid #282840; margin: 4px 0;" />
-            <button class="tool-btn" id="btnToggleSymmetry">⚖️ Simetria: LIGADA</button>
-            <button class="tool-btn" id="btnClearMap">🗑️ Limpar Tudo</button>
-            <button class="tool-btn" id="btnDefaultMap">🔄 Padrão</button>
-          </div>
-        </div>
+          <div class="editor-panel-controls">
+            <div class="editor-group-title">🧱 ELEMENTOS DO MAPA</div>
+            <div class="editor-tools-grid">
+              <button class="tool-btn active" id="toolWall">🧱 Parede</button>
+              <button class="tool-btn" id="toolDot">🟡 Pastilha</button>
+              <button class="tool-btn" id="toolEnergizer">⚪ Energizer</button>
+              <button class="tool-btn" id="toolErase">🧹 Borracha</button>
+              <button class="tool-btn" id="toolTunnel">🌀 Túnel</button>
+            </div>
 
-        <div class="editor-actions">
-          <button class="btn-secondary" id="btnExportJson">💾 Exportar JSON</button>
-          <button class="btn-secondary" id="btnImportJson">📂 Importar JSON</button>
-          <button class="btn-primary" id="btnPlayCustom">🎮 JOGAR AGORA</button>
+            <div class="editor-group-title" style="margin-top: 10px;">⚖️ FERRAMENTAS</div>
+            <div class="editor-tools-grid">
+              <button class="tool-btn" id="btnToggleSymmetry">⚖️ Simetria: LIGADA</button>
+              <button class="tool-btn" id="btnClearMap">🗑️ Limpar</button>
+              <button class="tool-btn" id="btnDefaultMap">🔄 Padrão</button>
+            </div>
+
+            <div class="editor-group-title" style="margin-top: 10px;">💾 ARQUIVO & AÇÃO</div>
+            <div class="editor-actions-vertical">
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-secondary" id="btnExportJson" style="flex: 1;">💾 Exportar</button>
+                <button class="btn-secondary" id="btnImportJson" style="flex: 1;">📂 Importar</button>
+              </div>
+              <button class="btn-primary btn-shop-highlight" id="btnPlayCustom" style="width: 100%; margin-top: 8px;">🎮 JOGAR AGORA</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
