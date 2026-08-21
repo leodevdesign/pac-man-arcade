@@ -1,0 +1,19 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/site/index.html"
+    },
+    {
+      "source": "/play",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/game",
+      "destination": "/index.html"
+    }
+  ]
+}
