@@ -31,8 +31,8 @@ function createWindow() {
   // Remove o menu bar completamente
   mainWindow.setMenuBarVisibility(false);
 
-  // Carrega o build do Vite (dist/index.html)
-  const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
+  // Carrega o build do jogo (dist/play.html)
+  const indexPath = path.join(__dirname, '..', 'dist', 'play.html');
   mainWindow.loadFile(indexPath);
 
   // Mostra a janela quando estiver pronta (evita flash branco)

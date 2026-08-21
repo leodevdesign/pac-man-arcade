@@ -2,327 +2,648 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pac-Man Arcade Remastered • Next Automatik Edition</title>
+    <meta
+      name="description"
+      content="A versão definitiva do clássico dos arcades. 150 conquistas progressivas, IA autêntica dos 4 fantasmas, modos Co-op e Versus, loja de upgrades, skins e estúdio de labirintos."
+    />
+    <!-- Favicon & Touch Icons -->
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/favicon.png" />
-    
-    <!-- Open Graph / Redes Sociais -->
-    <meta property="og:title" content="Pac-Man Arcade Definitive Edition" />
-    <meta property="og:description" content="Jogue a edição remasterizada do Pac-Man com IA autêntica, 150 conquistas, modos 2P e lojinha de upgrades!" />
-    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Open Graph (WhatsApp, Discord, Facebook, LinkedIn) -->
     <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pac-Man Arcade Remastered • Next Automatik Edition" />
+    <meta property="og:description" content="A lenda dos arcades recriada com IA autêntica dos 4 fantasmas, 150 conquistas progressivas, 5 modos de jogo, loja de upgrades, skins e estúdio de labirintos!" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter / X Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Pac-Man Arcade Definitive Edition" />
-    <meta name="twitter:description" content="Jogue a edição remasterizada do Pac-Man com IA autêntica, 150 conquistas, modos 2P e lojinha de upgrades!" />
+    <meta name="twitter:title" content="Pac-Man Arcade Remastered • Next Automatik Edition" />
+    <meta name="twitter:description" content="A lenda dos arcades recriada com IA autêntica dos 4 fantasmas, 150 conquistas, 5 modos de jogo e loja de upgrades!" />
     <meta name="twitter:image" content="/og-image.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/styles/style.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet da Landing Page -->
+    <link rel="stylesheet" href="/site/style.css" />
   </head>
   <body>
-    <div class="main-layout">
-      <!-- Painel Lateral Esquerdo: Configurações, Laboratório e Lojinha -->
-      <aside class="arcade-side-panel">
-        <div class="info-card">
-          <h2 class="info-card-title">🎮 CONFIGURAÇÕES</h2>
-          <div class="control-field">
-            <label class="field-label" for="modeSelect">Modo de Jogo</label>
-            <select id="modeSelect" class="map-select" aria-label="Modo de Jogo">
-              <option value="CLASSIC">🟡 Clássico 1P</option>
-              <option value="GHOST_HUNTER">👻 Invertido (Ghost Hunter)</option>
-              <option value="COOP_2P">👥 2P Co-op (Pac & Ms. Pac)</option>
-              <option value="VERSUS_2P">⚔️ 2P Versus (Pac vs Blinky)</option>
-              <option value="TURBO">⚡ Modo Turbo (2x)</option>
-            </select>
-          </div>
-
-          <div class="control-field">
-            <label class="field-label" for="mapSelect">Labirinto</label>
-            <select id="mapSelect" class="map-select" aria-label="Seletor de Labirinto">
-              <option value="classic_1980">🟡 Clássico 1980</option>
-              <option value="mspacman_1">🌸 Ms. Pac-Man: Rosa</option>
-              <option value="mspacman_2">🍊 Ms. Pac-Man: Laranja</option>
-              <option value="mspacman_3">🔷 Ms. Pac-Man: Ciano</option>
-              <option value="mspacman_4">🟤 Ms. Pac-Man: Dourado</option>
-              <option value="google_doodle">🌐 Google 30th Anniversary</option>
-              <option value="pacman_letters">🔤 PAC-MAN Typography</option>
-            </select>
-          </div>
-
-          <div class="control-field">
-            <label class="field-label" for="themeSelect">Tema Visual</label>
-            <select id="themeSelect" class="map-select" aria-label="Tema Gráfico">
-              <option value="CLASSIC">🕹️ Arcade 1980</option>
-              <option value="SYNTHWAVE">🌆 Synthwave Neon</option>
-              <option value="MATRIX">🟢 Matrix Terminal</option>
-              <option value="GAMEBOY">🎮 Game Boy 1989</option>
-            </select>
-          </div>
-
-          <div class="control-field">
-            <label class="field-label" for="skinSelect">Skin do Pac-Man</label>
-            <select id="skinSelect" class="map-select" aria-label="Skin do Pac-Man">
-              <option value="CLASSIC">🟡 Pac Clássico</option>
-              <option value="SUNGLASSES">🕶️ Óculos Escuros</option>
-              <option value="GOLDEN">👑 Dourado</option>
-              <option value="MS_PACMAN">🎀 Ms. Pac-Man</option>
-              <option value="CHRISTMAS">🎄 Pac de Natal</option>
-              <option value="HALLOWEEN">🎃 Pac de Halloween</option>
-              <option value="EASTER">🐰 Pac de Páscoa</option>
-              <option value="CYBERPUNK">🤖 Cyber Mecha</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <h2 class="info-card-title">🛠️ LABORATÓRIO</h2>
-          <div class="button-grid">
-            <button class="btn-secondary" id="btnProcedural">🎲 Procedural</button>
-            <button class="btn-secondary" id="btnOpenEditor">🛠️ Editor</button>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <h2 class="info-card-title">
-            <span>🌟 PROGRESSÃO</span>
-            <span id="headerCoinsCounter" class="coins-pill" style="font-size: 13px; padding: 2px 8px;">0 🪙</span>
-          </h2>
-          <button class="btn-primary btn-shop-highlight" id="btnOpenShop" style="width: 100%;">🏪 LOJINHA DE UPGRADES</button>
-          <div class="button-grid" style="margin-top: 6px;">
-            <button class="btn-secondary" id="btnOpenAchievements">🏆 Conquistas</button>
-            <button class="btn-secondary" id="btnOpenLeaderboard">🥇 Recordes</button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Painel Central: Gabinete com a Tela Expandida em 90% da Altura Sem Rolagem -->
-      <main class="arcade-center-panel">
-        <header class="arcade-header-compact">
-          <h1 class="arcade-title">PAC-MAN</h1>
-        </header>
-
-        <section class="cabinet-bezel">
-          <div class="canvas-wrapper scanlines-on" id="canvasWrapper">
-            <canvas id="gameCanvas" width="224" height="288"></canvas>
-            <div id="gameAttractOverlay" class="game-attract-overlay"></div>
-          </div>
-        </section>
-      </main>
-
-      <!-- Painel Lateral Direito: Ações Rápidas, IAs e Informações -->
-      <aside class="arcade-side-panel">
-        <div class="info-card">
-          <h2 class="info-card-title">🕹️ AÇÕES RÁPIDAS</h2>
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <button class="action-btn" id="btnPause">⏸️ Pausa [P]</button>
-            <button class="action-btn" id="btnMute">🔊 Efeitos Som [M]</button>
-            <button class="action-btn" id="btnSiren">🚨 Sirene: OFF [S]</button>
-            <button class="action-btn" id="btnDebug">🧠 IAs Debug [H]</button>
-            <button class="action-btn active" id="btnCrt">📺 CRT Scanlines</button>
-            <button class="action-btn" id="btnFullscreen">⛶ Tela Cheia</button>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <h2 class="info-card-title">👾 FANTASMAS</h2>
-          <div class="ghost-list">
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-blinky"></span>
-              <div><strong>BLINKY</strong> (Persegue)</div>
-            </div>
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-pinky"></span>
-              <div><strong>PINKY</strong> (Emboscada)</div>
-            </div>
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-inky"></span>
-              <div><strong>INKY</strong> (Pinça Dupla)</div>
-            </div>
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-clyde"></span>
-              <div><strong>CLYDE</strong> (Covarde 8t)</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <h2 class="info-card-title">⚡ POWER-UPS NO MAPA</h2>
-          <div class="controls-list">
-            <div class="control-row">
-              <span>💣 Bomba</span>
-              <span class="key-tag">Stun Área</span>
-            </div>
-            <div class="control-row">
-              <span>🧲 Ímã</span>
-              <span class="key-tag">Atrai Pastilhas</span>
-            </div>
-            <div class="control-row">
-              <span>🛡️ Escudo</span>
-              <span class="key-tag">Bloqueia Dano</span>
-            </div>
-            <div class="control-row">
-              <span>⏳ Gelo</span>
-              <span class="key-tag">Congela Todos</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <h2 class="info-card-title">⌨️ CONTROLES</h2>
-          <div class="controls-list">
-            <div class="control-row">
-              <span>P1 Mover</span>
-              <span class="key-tag">Setas</span>
-            </div>
-            <div class="control-row">
-              <span>P2 Mover</span>
-              <span class="key-tag">WASD</span>
-            </div>
-            <div class="control-row">
-              <span>Sirene Fundo</span>
-              <span class="key-tag">Tecla S</span>
-            </div>
-          </div>
-        </div>
-      </aside>
+    <!-- Barra de Anúncio Superior -->
+    <div class="top-announcement">
+      <span>🕹️ <strong>NOVA VERSÃO 2.0 REMASTERED</strong> • 100% GRATUITO • SEM ANÚNCIOS • CÓDIGO ABERTO</span>
     </div>
 
-    <!-- Modal: Inserção de Iniciais para Novo Recorde Arcade -->
-    <div class="editor-modal" id="newRecordModal" aria-modal="true" role="dialog">
-      <div class="editor-content modal-compact" style="max-width: 420px; text-align: center;">
-        <div class="editor-header">
-          <h2 class="editor-title" style="color: #ffff00;">🏆 NOVO RECORDE ARCADE!</h2>
-          <button class="editor-close" id="btnCloseNewRecord" aria-label="Fechar">&times;</button>
-        </div>
-        <div style="padding: 10px 0;">
-          <div style="font-size: 13px; color: #a5a5cc; margin-bottom: 6px;">SUA PONTUAÇÃO FINAL:</div>
-          <div id="newRecordScoreText" style="font-size: 24px; color: #00ff66; font-weight: bold; margin-bottom: 14px;">0 PONTOS</div>
-          
-          <div style="font-size: 13px; color: #ffffff; margin-bottom: 8px;">DIGITE SUAS 3 INICIAIS:</div>
-          <input 
-            type="text" 
-            id="inputInitials" 
-            maxlength="3" 
-            value="AAA" 
-            style="font-family: inherit; font-size: 1.8rem; letter-spacing: 12px; text-align: center; text-transform: uppercase; background: #000; color: #ffff00; border: 2px solid #a855f7; border-radius: 8px; padding: 10px; width: 160px; outline: none; margin-bottom: 14px;"
-          />
-
-          <div style="display: flex; gap: 8px; justify-content: center;">
-            <button class="btn-primary" id="btnSaveRecord" style="font-size: 14px;">💾 SALVAR NO RANKING</button>
+    <!-- Navegação Principal -->
+    <header class="site-header">
+      <div class="header-container">
+        <a href="#hero" class="brand-logo">
+          <span class="logo-icon">🟡</span>
+          <div class="logo-text">
+            <span class="logo-title">PAC-MAN <span class="badge-arcade">ARCADE</span></span>
+            <span class="logo-sub">NEXT AUTOMATIK EDITION</span>
           </div>
+        </a>
+
+        <nav class="nav-links">
+          <a href="#features">Recursos</a>
+          <a href="#modes">Modos de Jogo</a>
+          <a href="#showcase">Galeria</a>
+          <a href="#comparison">Diferenciais</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <div class="header-actions">
+          <a href="#download" class="btn-nav-download">
+            <span>📥 Baixar PC</span>
+          </a>
+          <a href="/play" class="btn-nav-play">
+            <span>🕹️ Jogar Online</span>
+          </a>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Modal: Lojinha de Upgrades & Skins -->
-    <div class="editor-modal" id="shopModal" aria-modal="true" role="dialog">
-      <div class="editor-content modal-wide">
-        <div class="editor-header">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.3rem;">🏪</span>
-            <h2 class="editor-title">LOJINHA DO PAC-MAN</h2>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span id="shopCoinsAmount" class="coins-pill">0 🪙</span>
-            <button class="editor-close" id="btnCloseShop" aria-label="Fechar">&times;</button>
-          </div>
-        </div>
-
-        <div class="shop-modal-body"></div>
-      </div>
-    </div>
-
-    <!-- Modal: Conquistas / Achievements -->
-    <div class="editor-modal" id="achievementsModal" aria-modal="true" role="dialog">
-      <div class="editor-content modal-fullscreen">
-        <div class="editor-header">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.3rem;">🏆</span>
-            <h2 class="editor-title">CONQUISTAS PROGRESSIVAS</h2>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span id="achievementsProgress" class="coins-pill">0 / 150 ⭐</span>
-            <button class="editor-close" id="btnCloseAchievements" aria-label="Fechar">&times;</button>
-          </div>
-        </div>
-
-        <div id="achievementsList"></div>
-      </div>
-    </div>
-
-    <!-- Modal: Ranking de Recordes -->
-    <div class="editor-modal" id="leaderboardModal" aria-modal="true" role="dialog">
-      <div class="editor-content modal-compact">
-        <div class="editor-header">
-          <h2 class="editor-title">🥇 TOP 10 RECORDES ARCADE</h2>
-          <button class="editor-close" id="btnCloseLeaderboard" aria-label="Fechar">&times;</button>
-        </div>
-        <div style="overflow-x: auto; margin-top: 8px;">
-          <table class="leaderboard-table">
-            <thead>
-              <tr>
-                <th>POS</th>
-                <th>NOME</th>
-                <th style="text-align: right;">PONTOS</th>
-                <th style="text-align: center;">NÍVEL</th>
-                <th>DATA</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboardRows"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal: Editor de Labirintos -->
-    <div class="editor-modal" id="editorModal" aria-modal="true" role="dialog">
-      <div class="editor-content modal-wide">
-        <div class="editor-header">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.3rem;">🛠️</span>
-            <h2 class="editor-title">ESTÚDIO DE LABIRINTOS</h2>
-          </div>
-          <button class="editor-close" id="btnCloseEditor" aria-label="Fechar">&times;</button>
-        </div>
-
-        <div class="editor-studio-layout">
-          <div class="editor-canvas-box">
-            <canvas id="editorCanvas" width="224" height="288"></canvas>
-          </div>
-
-          <div class="editor-panel-controls">
-            <div class="editor-group-title">🧱 ELEMENTOS DO MAPA</div>
-            <div class="editor-tools-grid">
-              <button class="tool-btn active" id="toolWall">🧱 Parede</button>
-              <button class="tool-btn" id="toolDot">🟡 Pastilha</button>
-              <button class="tool-btn" id="toolEnergizer">⚪ Energizer</button>
-              <button class="tool-btn" id="toolErase">🧹 Borracha</button>
-              <button class="tool-btn" id="toolTunnel">🌀 Túnel</button>
+    <main>
+      <!-- =====================================================================
+       * HERO SECTION
+       * ===================================================================== -->
+      <section class="hero-section" id="hero">
+        <div class="hero-glow-bg"></div>
+        <div class="container hero-content">
+          <div class="hero-text-col">
+            <div class="hero-pill-badge">
+              <span class="pulse-dot"></span>
+              <span>Edição Remasterizada em Alta Definição</span>
             </div>
 
-            <div class="editor-group-title" style="margin-top: 10px;">⚖️ FERRAMENTAS</div>
-            <div class="editor-tools-grid">
-              <button class="tool-btn" id="btnToggleSymmetry">⚖️ Simetria: LIGADA</button>
-              <button class="tool-btn" id="btnClearMap">🗑️ Limpar</button>
-              <button class="tool-btn" id="btnDefaultMap">🔄 Padrão</button>
+            <h1 class="hero-title">
+              A LENDA DOS ARCADES,<br />
+              <span class="text-gradient">TOTALMENTE REINVENTADA.</span>
+            </h1>
+
+            <p class="hero-subtitle">
+              O clássico imortal dos anos 80 recriado com <strong>IA autêntica dos 4 fantasmas</strong>,
+              <strong>150 conquistas progressivas</strong>, modos <strong>2P Co-op e Versus</strong>,
+              <strong>loja com upgrades e skins</strong> e um <strong>estúdio de labirintos</strong> integrado.
+            </p>
+
+            <div class="hero-cta-group">
+              <a href="#download" class="btn-hero-primary btn-shimmer">
+                <span class="btn-icon">📥</span>
+                <div class="btn-label-group">
+                  <span class="btn-main-label">BAIXAR PARA WINDOWS</span>
+                  <span class="btn-sub-label">Instalador .exe • 64-bit • Auto-Update</span>
+                </div>
+              </a>
+
+              <a href="/play" class="btn-hero-secondary">
+                <span class="btn-icon">🕹️</span>
+                <div class="btn-label-group">
+                  <span class="btn-main-label">JOGAR NO NAVEGADOR</span>
+                  <span class="btn-sub-label">Instant Play • 60 FPS Suave</span>
+                </div>
+              </a>
             </div>
 
-            <div class="editor-group-title" style="margin-top: 10px;">💾 ARQUIVO & AÇÃO</div>
-            <div class="editor-actions-vertical">
-              <div style="display: flex; gap: 8px;">
-                <button class="btn-secondary" id="btnExportJson" style="flex: 1;">💾 Exportar</button>
-                <button class="btn-secondary" id="btnImportJson" style="flex: 1;">📂 Importar</button>
+            <div class="hero-stats-row">
+              <div class="stat-item">
+                <span class="stat-number">150</span>
+                <span class="stat-desc">Conquistas (3 Tiers)</span>
               </div>
-              <button class="btn-primary btn-shop-highlight" id="btnPlayCustom" style="width: 100%; margin-top: 8px;">🎮 JOGAR AGORA</button>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <span class="stat-number">5</span>
+                <span class="stat-desc">Modos de Jogo</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <span class="stat-number">8</span>
+                <span class="stat-desc">Skins Pixel-Art</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-desc">Grátis & Sem Ads</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-preview-col">
+            <div class="arcade-cabinet-mockup">
+              <div class="mockup-header-bar">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+                <span class="mockup-title-text">PAC-MAN ARCADE STUDIO</span>
+              </div>
+              <div class="mockup-image-frame">
+                <img
+                  src="/site/assets/images/gameplay-preview.png"
+                  alt="Pac-Man Arcade em Alta Resolução"
+                  class="hero-mockup-img"
+                />
+                <div class="mockup-floating-badge badge-ghost-blinky">
+                  <span>👾 Blinky (Perseguição Ativa)</span>
+                </div>
+                <div class="mockup-floating-badge badge-fps">
+                  <span>⚡ 60 FPS • Resolução Vetorial</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
 
-    <script type="module" src="/src/main.ts"></script>
+      <!-- =====================================================================
+       * RECURSOS INOVADORES
+       * ===================================================================== -->
+      <section class="features-section" id="features">
+        <div class="container">
+          <div class="section-header text-center">
+            <span class="section-tag">TECNOLOGIA & FIDELIDADE</span>
+            <h2 class="section-title">O QUE TORNA ESTA VERSÃO ÚNICA</h2>
+            <p class="section-description">
+              Combinamos a matemática original do arcade de 1980 com sistemas modernos de progressão,
+              economia e personalização.
+            </p>
+          </div>
+
+          <div class="features-grid">
+            <!-- Card 1: IA Autêntica -->
+            <div class="feature-card">
+              <div class="feature-icon-box">🧠</div>
+              <h3 class="feature-title">IA Autêntica dos 4 Fantasmas</h3>
+              <p class="feature-text">
+                Cada fantasma possui a sua personalidade exata: <strong>Blinky</strong> mira direto no Pac-Man,
+                <strong>Pinky</strong> faz emboscada 4 tiles à frente, <strong>Inky</strong> calcula vetor de pinça dupla e
+                <strong>Clyde</strong> se afasta em raio de 8 tiles.
+              </p>
+              <div class="feature-tags">
+                <span class="tag">Fidelidade 1980</span>
+                <span class="tag">Tile Target Logic</span>
+              </div>
+            </div>
+
+            <!-- Card 2: 150 Conquistas -->
+            <div class="feature-card highlight-card">
+              <div class="feature-icon-box">🏆</div>
+              <h3 class="feature-title">150 Conquistas Progressivas</h3>
+              <p class="feature-text">
+                50 trilhas de missões organizadas em <strong>Bronze (⭐)</strong>, <strong>Prata (⭐⭐)</strong> e <strong>Ouro (⭐⭐⭐)</strong>.
+                Ganhe moedas para desbloquear skins e power-ups conforme você joga.
+              </p>
+              <div class="feature-tags">
+                <span class="tag">Bronze • Prata • Ouro</span>
+                <span class="tag">Recompensas 🪙</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Lojinha de Upgrades & Skins -->
+            <div class="feature-card">
+              <div class="feature-icon-box">🏪</div>
+              <h3 class="feature-title">Loja de Upgrades & 8 Skins</h3>
+              <p class="feature-text">
+                Compre melhorias cumulativas (Vidas extras, Duração do Energizer, Multiplicador de Frutas, Super Ímã, Escudo e Bombas)
+                e equipe 8 visuais pixel-art personalizados.
+              </p>
+              <div class="feature-tags">
+                <span class="tag">7 Trilhas Upgrades</span>
+                <span class="tag">8 Skins Únicas</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Estúdio de Labirintos -->
+            <div class="feature-card">
+              <div class="feature-icon-box">🛠️</div>
+              <h3 class="feature-title">Estúdio de Labirintos em Tempo Real</h3>
+              <p class="feature-text">
+                Crie seus próprios mapas com ferramenta de <strong>simetria bilateral automática</strong>,
+                posicione pastilhas, energizers e túneis. Exporte ou importe em JSON e jogue instantaneamente!
+              </p>
+              <div class="feature-tags">
+                <span class="tag">Simetria Bilateral</span>
+                <span class="tag">Export / Import JSON</span>
+              </div>
+            </div>
+
+            <!-- Card 5: Power-ups no Mapa -->
+            <div class="feature-card">
+              <div class="feature-icon-box">⚡</div>
+              <h3 class="feature-title">Power-ups Dinâmicos no Labirinto</h3>
+              <p class="feature-text">
+                Colete itens especiais durante as partidas: <strong>Bombas de Stun</strong> em área, <strong>Super Ímã</strong> que atrai pastilhas,
+                <strong>Escudo de Energia</strong> contra colisões e <strong>Ampulheta de Gelo</strong> para congelar os fantasmas.
+              </p>
+              <div class="feature-tags">
+                <span class="tag">Stun • Escudo</span>
+                <span class="tag">Ímã • Congelamento</span>
+              </div>
+            </div>
+
+            <!-- Card 6: Ranking Retrô com Iniciais -->
+            <div class="feature-card">
+              <div class="feature-icon-box">🥇</div>
+              <h3 class="feature-title">Ranking Arcade com 3 Iniciais</h3>
+              <p class="feature-text">
+                Bata o seu recorde e registre suas 3 iniciais (AAA, PRO, LEO) no hall da fama arcade.
+                Histórico persistente e imune a apagamentos acidentais.
+              </p>
+              <div class="feature-tags">
+                <span class="tag">Top 10 Hall of Fame</span>
+                <span class="tag">Save Automático</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+       * MODOS DE JOGO
+       * ===================================================================== -->
+      <section class="modes-section" id="modes">
+        <div class="container">
+          <div class="section-header text-center">
+            <span class="section-tag">DIVERSÃO MULTIPLAYER & SOLO</span>
+            <h2 class="section-title">5 FORMAS INÉDITAS DE JOGAR</h2>
+            <p class="section-description">
+              Escolha seu modo preferido e experimente dinâmicas de jogo que vão muito além do fliperama original.
+            </p>
+          </div>
+
+          <div class="modes-grid">
+            <div class="mode-card">
+              <div class="mode-badge">ARCADE PURISTA</div>
+              <div class="mode-icon">🟡</div>
+              <h3 class="mode-title">Clássico 1P</h3>
+              <p class="mode-text">
+                A experiência original de 1980 com física de curvas de canto, velocidade exata, fases de frutas e
+                comportamento clássico de dispersão/perseguição.
+              </p>
+            </div>
+
+            <div class="mode-card highlight-mode">
+              <div class="mode-badge">PAPÉIS INVERTIDOS</div>
+              <div class="mode-icon">👻</div>
+              <h3 class="mode-title">Ghost Hunter</h3>
+              <p class="mode-text">
+                Você é o caçador! Os fantasmas começam vulneráveis e tentam fugir desesperadamente enquanto você limpa o labirinto em alta velocidade.
+              </p>
+            </div>
+
+            <div class="mode-card">
+              <div class="mode-badge">2 JOGADORES</div>
+              <div class="mode-icon">👥</div>
+              <h3 class="mode-title">2P Co-op (Pac & Ms. Pac)</h3>
+              <p class="mode-text">
+                Jogue em dupla no mesmo teclado! P1 controla o Pac-Man (Setas) e P2 controla a Ms. Pac-Man (WASD) dividindo vidas e estratégias.
+              </p>
+            </div>
+
+            <div class="mode-card">
+              <div class="mode-badge">PVP LOCAL</div>
+              <div class="mode-icon">⚔️</div>
+              <h3 class="mode-title">2P Versus (Pac vs Blinky)</h3>
+              <p class="mode-text">
+                Um jogador assume o Pac-Man e o outro assume o controle manual do fantasma Blinky com velocidade agressiva. Quem sobreviverá?
+              </p>
+            </div>
+
+            <div class="mode-card">
+              <div class="mode-badge">REFLEXOS EXTREMOS</div>
+              <div class="mode-icon">⚡</div>
+              <h3 class="mode-title">Modo Turbo (2x)</h3>
+              <p class="mode-text">
+                Velocidade dobrada para Pac-Man e fantasmas. Para quem busca um teste de reflexos puro e adrenalina máxima no arcade.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+       * GALERIA DE TELAS & SHOWCASE
+       * ===================================================================== -->
+      <section class="showcase-section" id="showcase">
+        <div class="container">
+          <div class="section-header text-center">
+            <span class="section-tag">DESIGN SYSTEM NEXT AUTOMATIK</span>
+            <h2 class="section-title">CONHEÇA AS TELAS DO JOGO</h2>
+            <p class="section-description">
+              Interface moderna construída em Roxo Glassmorphism, com tipografia nítida e efeitos neon vibrantes.
+            </p>
+          </div>
+
+          <div class="showcase-tabs">
+            <button class="tab-btn active" data-target="tab-gameplay">🕹️ Jogo em Alta Definição</button>
+            <button class="tab-btn" data-target="tab-achievements">🏆 150 Conquistas</button>
+            <button class="tab-btn" data-target="tab-shop">🏪 Loja & Upgrades</button>
+            <button class="tab-btn" data-target="tab-editor">🛠️ Estúdio de Labirintos</button>
+          </div>
+
+          <div class="showcase-display">
+            <div class="showcase-panel active" id="tab-gameplay">
+              <div class="showcase-media-box">
+                <img src="/site/assets/images/gameplay-preview.png" alt="Tela do Jogo Pac-Man" class="showcase-img" />
+              </div>
+              <div class="showcase-info-box">
+                <h3>Gabinete Arcade em Alta Definição</h3>
+                <p>
+                  A tela inicial conta com <strong>overlay vetorial subpixel</strong> que elimina qualquer borrão ou serrilhado.
+                  Você pode alternar filtros CRT scanlines, pausar a qualquer momento e mutar sons individuais (como a sirene de fundo).
+                </p>
+                <ul class="feature-bullets">
+                  <li>✨ Letras 100% nítidas com anti-aliasing cristalino</li>
+                  <li>🚨 Controle de som independente (silencie a sirene sem tirar os efeitos)</li>
+                  <li>🧠 Modo Debug em tempo real [H] com alvos dos fantasmas na tela</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="showcase-panel" id="tab-achievements">
+              <div class="showcase-media-box">
+                <img src="/site/assets/images/achievements-preview.png" alt="Tela de Conquistas Progressivas" class="showcase-img" />
+              </div>
+              <div class="showcase-info-box">
+                <h3>50 Trilhas com 150 Níveis de Conquista</h3>
+                <p>
+                  Cada missão possui 3 níveis (Bronze ⭐, Prata ⭐⭐ e Ouro ⭐⭐⭐). Ao completar um nível,
+                  você ganha moedas de ouro para gastar na loja e uma notificação brilhante aparece na tela.
+                </p>
+                <ul class="feature-bullets">
+                  <li>⭐ Filtros rápidos: Todas, Em Progresso, Concluídas e Mestres</li>
+                  <li>🪙 Recompensas progressivas em moedas de ouro</li>
+                  <li>🔥 Notificações sonoras ao desbloquear novos títulos</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="showcase-panel" id="tab-shop">
+              <div class="showcase-media-box">
+                <img src="/site/assets/images/shop-preview.png" alt="Lojinha de Upgrades e Skins" class="showcase-img" />
+              </div>
+              <div class="showcase-info-box">
+                <h3>Loja com 7 Trilhas de Upgrades & 8 Skins</h3>
+                <p>
+                  Personalize seu estilo de jogo. Melhore a duração do energizer, multiplique o valor das frutas,
+                  aumente o alcance do ímã ou equipe skins lendárias como a <strong>Skin Dourada</strong> ou <strong>Óculos Escuros</strong>.
+                </p>
+                <ul class="feature-bullets">
+                  <li>🕶️ 8 Skins pixel-art com animações autênticas</li>
+                  <li>⚡ 7 Upgrades cumulativos para facilitar fases difíceis</li>
+                  <li>💾 Save permanente no disco local</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="showcase-panel" id="tab-editor">
+              <div class="showcase-media-box">
+                <img src="/site/assets/images/editor-preview.png" alt="Estúdio de Labirintos" class="showcase-img" />
+              </div>
+              <div class="showcase-info-box">
+                <h3>Estúdio de Criação de Fases</h3>
+                <p>
+                  Desenhe seus próprios labirintos em uma tela espaçosa de 54% com ferramentas de simetria bilateral automática.
+                  Exporte o arquivo em JSON para compartilhar com amigos ou carregue mapas criados por outros jogadores.
+                </p>
+                <ul class="feature-bullets">
+                  <li>⚖️ Simetria bilateral automática (desenha os dois lados juntos)</li>
+                  <li>🌀 Ferramenta de Túneis de Teletransporte</li>
+                  <li>🎮 Botão "JOGAR AGORA" para testar sua fase imediatamente</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+       * TABELA COMPARATIVA
+       * ===================================================================== -->
+      <section class="comparison-section" id="comparison">
+        <div class="container">
+          <div class="section-header text-center">
+            <span class="section-tag">POR QUE É SUPERIOR</span>
+            <h2 class="section-title">CLÁSSICO 1980 VS. REMASTER 2026</h2>
+            <p class="section-description">
+              Veja as diferenças entre o jogo arcade original e a edição aprimorada Next Automatik.
+            </p>
+          </div>
+
+          <div class="comparison-table-wrapper">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th>RECURSO</th>
+                  <th class="col-old">ARCADE 1980 ORIGINAL</th>
+                  <th class="col-new">PAC-MAN NEXT AUTOMATIK</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>IA Autêntica dos 4 Fantasmas</strong></td>
+                  <td class="col-old">✅ Sim</td>
+                  <td class="col-new">✅ Sim (100% fiel à matemática de 1980)</td>
+                </tr>
+                <tr>
+                  <td><strong>Sistema de Conquistas</strong></td>
+                  <td class="col-old">❌ Não</td>
+                  <td class="col-new">🏆 150 Conquistas em 3 Tiers (Bronze/Prata/Ouro)</td>
+                </tr>
+                <tr>
+                  <td><strong>Loja de Upgrades & Moedas</strong></td>
+                  <td class="col-old">❌ Não</td>
+                  <td class="col-new">🏪 7 Trilhas de Upgrades Cumulativos</td>
+                </tr>
+                <tr>
+                  <td><strong>Skins Personalizadas</strong></td>
+                  <td class="col-old">❌ Não</td>
+                  <td class="col-new">🕶️ 8 Skins Pixel-Art Desbloqueáveis</td>
+                </tr>
+                <tr>
+                  <td><strong>Modos Multiplayer (Co-op & Versus)</strong></td>
+                  <td class="col-old">❌ Alternado (Turnos)</td>
+                  <td class="col-new">👥 Co-op Simultâneo e Versus (Pac vs Fantasma)</td>
+                </tr>
+                <tr>
+                  <td><strong>Estúdio Criador de Labirintos</strong></td>
+                  <td class="col-old">❌ Mapas Fixos</td>
+                  <td class="col-new">🛠️ Criador de Fases com Export/Import JSON</td>
+                </tr>
+                <tr>
+                  <td><strong>Filtros Visuais & Áudio Independente</strong></td>
+                  <td class="col-old">❌ Não</td>
+                  <td class="col-new">🔊 Controle de Sirene & Filtro CRT Scanlines</td>
+                </tr>
+                <tr>
+                  <td><strong>Preço / Licença</strong></td>
+                  <td class="col-old">Fichas / Arcade</td>
+                  <td class="col-new">🎁 100% Gratuito & Livre de Anúncios</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+       * DOWNLOAD SECTION (CALL TO ACTION)
+       * ===================================================================== -->
+      <section class="download-section" id="download">
+        <div class="container">
+          <div class="download-card-banner">
+            <div class="download-badge">VERSÃO ESTÁVEL v2.0</div>
+            <h2 class="download-title">PRONTO PARA DOMINAR O LABIRINTO?</h2>
+            <p class="download-desc">
+              Escolha como prefere jogar: baixe o executável para o seu computador com salvamento offline,
+              ou jogue diretamente pelo navegador sem instalar nada!
+            </p>
+
+            <div class="download-buttons-wrapper">
+              <a href="https://github.com/leodevdesign/pac-man-arcade/releases" target="_blank" class="btn-download-primary btn-shimmer" id="btnDownloadExe">
+                <span class="btn-icon">📥</span>
+                <div class="btn-label-group">
+                  <span class="btn-main-label">BAIXAR PARA WINDOWS (.EXE)</span>
+                  <span class="btn-sub-label">Instalador Oficial • Save Automático no PC</span>
+                </div>
+              </a>
+
+              <a href="/play" class="btn-download-secondary">
+                <span class="btn-icon">🕹️</span>
+                <div class="btn-label-group">
+                  <span class="btn-main-label">JOGAR NO NAVEGADOR</span>
+                  <span class="btn-sub-label">Acesso Imediato • 100% Funcional</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="download-specs-row">
+              <span>🖥️ Compatível com Windows 10 e 11 (64-bit)</span>
+              <span>•</span>
+              <span>💾 Instalador (~82 MB • Motor 60 FPS Embutido)</span>
+              <span>•</span>
+              <span>🛡️ Sem vírus, sem telemetria, sem anúncios</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+       * FAQ (PERGUNTAS FREQUENTES)
+       * ===================================================================== -->
+      <section class="faq-section" id="faq">
+        <div class="container">
+          <div class="section-header text-center">
+            <span class="section-tag">TIRE SUAS DÚVIDAS</span>
+            <h2 class="section-title">PERGUNTAS FREQUENTES</h2>
+          </div>
+
+          <div class="faq-accordion">
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>O jogo é realmente 100% gratuito?</span>
+                <span class="faq-arrow">▼</span>
+              </button>
+              <div class="faq-answer">
+                <p>
+                  <strong>Sim, totalmente gratuito!</strong> Não há anúncios, microtransações com dinheiro real nem assinaturas.
+                  Todas as moedas do jogo são obtidas jogando, quebrando recordes e desbloqueando as 150 conquistas.
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>Onde fica salvo o meu progresso e as minhas moedas?</span>
+                <span class="faq-arrow">▼</span>
+              </button>
+              <div class="faq-answer">
+                <p>
+                  Na <strong>versão para computador (.exe)</strong>, o jogo salva automaticamente na pasta do sistema do Windows
+                  (<code>%APPDATA%/pac-man-arcade/Local Storage</code>). Na <strong>versão web</strong>, ele salva no armazenamento local do navegador.
+                  Ambos são permanentes e mantêm suas moedas, skins e conquistas salvas para sempre.
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>Como funcionam as atualizações do jogo no computador?</span>
+                <span class="faq-arrow">▼</span>
+              </button>
+              <div class="faq-answer">
+                <p>
+                  Quando uma nova versão ou novos labirintos forem lançados no repositório do GitHub, o jogo avisa automaticamente
+                  ao abrir para você atualizar em 1 clique, sem perder nenhum dos seus dados ou moedas acumuladas!
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>Consigo jogar no Mac ou no Celular?</span>
+                <span class="faq-arrow">▼</span>
+              </button>
+              <div class="faq-answer">
+                <p>
+                  Sim! Através da versão web no navegador, o jogo roda perfeitamente no Mac, Linux, smartphones e tablets com controles por toque na tela.
+                </p>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>Como funciona o criador de mapas e como compartilho com amigos?</span>
+                <span class="faq-arrow">▼</span>
+              </button>
+              <div class="faq-answer">
+                <p>
+                  Dentro do jogo, abra o <strong>Estúdio de Labirintos</strong>. Desenhe seu mapa e clique em <code>Exportar JSON</code>.
+                  Ele gerará um arquivo com o código do seu mapa. Seu amigo só precisa clicar em <code>Importar JSON</code> e carregar o arquivo para jogar sua fase!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="site-footer">
+      <div class="container footer-container">
+        <div class="footer-brand">
+          <div class="footer-logo">🟡 PAC-MAN ARCADE</div>
+          <p class="footer-copy">
+            Desenvolvido com carinho pelo time <strong>Next Automatik</strong>.<br />
+            Projeto de tributo sem fins lucrativos dedicado aos entusiastas da era de ouro dos arcades.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <a href="https://github.com/leodevdesign/pac-man-arcade" target="_blank" class="footer-link">
+            <span>🐙 GitHub Repositório</span>
+          </a>
+          <a href="/play" class="footer-link">
+            <span>🕹️ Abrir Jogo Online</span>
+          </a>
+        </div>
+      </div>
+      <div class="footer-bottom text-center">
+        <span>© 2026 Next Automatik. Pac-Man é uma marca registrada de seus respectivos detentores.</span>
+      </div>
+    </footer>
+
+    <!-- Script Interativo -->
+    <script type="module" src="/site/main.js"></script>
   </body>
 </html>

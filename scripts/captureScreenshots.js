@@ -14,7 +14,7 @@ async function capture() {
     deviceScaleFactor: 2, // 2x Retina para máxima nitidez
   });
 
-  await page.goto('http://localhost:5173/', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://localhost:5173/play.html', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#gameCanvas');
   await page.waitForTimeout(1500);
 
