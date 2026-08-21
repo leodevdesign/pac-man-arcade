@@ -4,30 +4,27 @@ import path from 'path';
 import pngToIco from 'png-to-ico';
 
 async function generateAssets() {
-  console.log('🎨 Iniciando geração de Favicons, Ícones e Imagem OpenGraph para Redes Sociais...');
+  console.log('🎨 Iniciando geração de Favicons Transparentes, Ícones e Banner OpenGraph...');
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  // 1. GERAÇÃO DO ÍCONE / FAVICON (512x512)
+  // 1. GERAÇÃO DO FAVICON / ÍCONE COM FUNDO 100% TRANSPARENTE
   await page.setViewportSize({ width: 512, height: 512 });
   await page.setContent(`
     <!DOCTYPE html>
     <html>
     <head>
       <style>
-        body {
+        html, body {
           margin: 0;
           padding: 0;
           width: 512px;
           height: 512px;
-          background: transparent;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          background: transparent !important;
         }
         canvas {
-          display: block;
+          background: transparent !important;
         }
       </style>
     </head>
@@ -37,84 +34,96 @@ async function generateAssets() {
         const canvas = document.getElementById('iconCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Fundo circular roxo escuro com borda neon
-        const center = 256;
-        const radius = 240;
+        // Garante transparência total
+        ctx.clearRect(0, 0, 512, 512);
 
-        // Sombra / Brilho Neon
-        ctx.shadowColor = '#a855f7';
-        ctx.shadowBlur = 35;
-
-        // Gradiente do fundo do ícone
-        const bgGrad = ctx.createRadialGradient(center, center, 40, center, center, radius);
-        bgGrad.addColorStop(0, '#2d1054');
-        bgGrad.addColorStop(0.7, '#140826');
-        bgGrad.addColorStop(1, '#080412');
-
-        ctx.fillStyle = bgGrad;
-        ctx.beginPath();
-        ctx.arc(center, center, radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Borda Roxa Violeta
-        ctx.lineWidth = 14;
-        ctx.strokeStyle = '#c084fc';
-        ctx.stroke();
-
-        ctx.shadowBlur = 0; // reseta sombra para desenhar o Pac-Man
-
-        // Pac-Man Amarelo Dourado
         const pacX = 230;
         const pacY = 256;
-        const pacRadius = 140;
+        const pacRadius = 175;
 
-        // Brilho do Pac-Man
-        ctx.shadowColor = '#ffe600';
-        ctx.shadowBlur = 25;
+        // 1. Contorno Neon Roxo / Violeta (Next Automatik Identity)
+        ctx.save();
+        ctx.shadowColor = '#9333ea';
+        ctx.shadowBlur = 30;
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 18;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        const startAngle = 0.26 * Math.PI;
+        const endAngle = 1.74 * Math.PI;
+        ctx.arc(pacX, pacY, pacRadius + 4, startAngle, endAngle, false);
+        ctx.lineTo(pacX, pacY);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
 
-        const pacGrad = ctx.createRadialGradient(pacX - 30, pacY - 30, 20, pacX, pacY, pacRadius);
-        pacGrad.addColorStop(0, '#fff475');
-        pacGrad.addColorStop(0.5, '#ffe600');
-        pacGrad.addColorStop(1, '#e6b800');
+        // 2. Corpo do Pac-Man (Amarelo Vibrante com Gradiente Radial)
+        ctx.save();
+        const pacGrad = ctx.createRadialGradient(pacX - 40, pacY - 40, 20, pacX, pacY, pacRadius);
+        pacGrad.addColorStop(0, '#fff677');
+        pacGrad.addColorStop(0.65, '#ffe600');
+        pacGrad.addColorStop(1, '#e5b700');
 
         ctx.fillStyle = pacGrad;
         ctx.beginPath();
-        const startAngle = 0.25 * Math.PI;
-        const endAngle = 1.75 * Math.PI;
         ctx.arc(pacX, pacY, pacRadius, startAngle, endAngle, false);
         ctx.lineTo(pacX, pacY);
         ctx.closePath();
         ctx.fill();
 
-        // Olho do Pac-Man
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#0d051c';
+        // Borda interna suave
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.restore();
+
+        // 3. Olho do Pac-Man (Roxo Escuro Profundo)
+        ctx.save();
+        ctx.fillStyle = '#140826';
         ctx.beginPath();
-        ctx.arc(pacX + 25, pacY - 70, 18, 0, Math.PI * 2);
+        ctx.arc(pacX + 30, pacY - 85, 22, 0, Math.PI * 2);
         ctx.fill();
 
-        // Pastilhas de Energia (Dots)
-        ctx.shadowColor = '#ffd700';
-        ctx.shadowBlur = 15;
+        // Brilho do olho
+        ctx.fillStyle = '#f3e8ff';
+        ctx.beginPath();
+        ctx.arc(pacX + 36, pacY - 90, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 4. Pastilhas de Energia (Dots) com Brilho Neon Violeta/Dourado
+        ctx.save();
+        ctx.shadowColor = '#c084fc';
+        ctx.shadowBlur = 18;
+
+        // Pastilha 1 (Branca)
         ctx.fillStyle = '#ffffff';
-
-        // Pastilha 1
         ctx.beginPath();
-        ctx.arc(380, 256, 18, 0, Math.PI * 2);
+        ctx.arc(425, 256, 22, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth = 5;
+        ctx.stroke();
 
-        // Pastilha 2 (Energizer maior)
+        // Pastilha 2 (Dourada)
         ctx.fillStyle = '#ffd700';
         ctx.beginPath();
-        ctx.arc(435, 256, 14, 0, Math.PI * 2);
+        ctx.arc(485, 256, 16, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
       </script>
     </body>
     </html>
   `);
 
-  await page.waitForTimeout(500);
-  const iconCanvas = await page.$('#iconCanvas');
+  await page.waitForTimeout(400);
+
+  // Extrai os dados em formato PNG direto do Canvas (100% transparente)
+  const base64Data = await page.evaluate(() => {
+    const canvas = document.getElementById('iconCanvas');
+    return canvas.toDataURL('image/png').split(',')[1];
+  });
+  const iconPngBuffer = Buffer.from(base64Data, 'base64');
 
   const publicDir = path.join(process.cwd(), 'public');
   const buildDir = path.join(process.cwd(), 'build');
@@ -128,16 +137,16 @@ async function generateAssets() {
   const faviconPath = path.join(publicDir, 'favicon.png');
   const siteFaviconPath = path.join(siteAssetsDir, 'favicon.png');
 
-  await iconCanvas.screenshot({ path: icon512Path });
-  await iconCanvas.screenshot({ path: faviconPath });
-  await iconCanvas.screenshot({ path: siteFaviconPath });
-  console.log('✅ Favicon e Icon PNG (512x512) gerados com sucesso!');
+  fs.writeFileSync(icon512Path, iconPngBuffer);
+  fs.writeFileSync(faviconPath, iconPngBuffer);
+  fs.writeFileSync(siteFaviconPath, iconPngBuffer);
+  console.log('✅ Favicon PNG Transparente (sem fundo branco) gerado com sucesso!');
 
-  // Gera o icon.ico nativo Windows com múltiplos tamanhos
+  // Gera o icon.ico nativo Windows com múltiplos tamanhos a partir do PNG transparente
   const icoBuffer = await pngToIco(icon512Path);
   fs.writeFileSync(path.join(buildDir, 'icon.ico'), icoBuffer);
   fs.writeFileSync(path.join(publicDir, 'favicon.ico'), icoBuffer);
-  console.log('✅ icon.ico e favicon.ico gerados com sucesso!');
+  console.log('✅ icon.ico e favicon.ico transparentes gerados com sucesso!');
 
   // 2. GERAÇÃO DA IMAGEM OPEN GRAPH (1200x630) PARA REDES SOCIAIS
   await page.setViewportSize({ width: 1200, height: 630 });
@@ -166,7 +175,6 @@ async function generateAssets() {
           overflow: hidden;
         }
 
-        /* Grade de fundo sutil */
         .grid-bg {
           position: absolute;
           inset: 0;
@@ -182,7 +190,7 @@ async function generateAssets() {
           width: 500px;
           height: 500px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, rgba(0,0,0,0) 70%);
+          background: radial-gradient(circle, rgba(124, 58, 237, 0.35) 0%, rgba(0,0,0,0) 70%);
           top: -100px;
           left: -100px;
           pointer-events: none;
@@ -348,7 +356,7 @@ async function generateAssets() {
     </html>
   `);
 
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(500);
   const ogImagePath = path.join(publicDir, 'og-image.png');
   const siteOgImagePath = path.join(siteAssetsDir, 'og-image.png');
 
@@ -357,7 +365,7 @@ async function generateAssets() {
   console.log('✅ Imagem Open Graph (1200x630) gerada com sucesso em public/og-image.png!');
 
   await browser.close();
-  console.log('🎉 Todos os assets visuais e ícones gerados com 100% de perfeição!');
+  console.log('🎉 Todos os assets visuais transparentes gerados com sucesso!');
 }
 
 generateAssets().catch(err => {

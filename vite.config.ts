@@ -2,8 +2,8 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  // Caminhos relativos para compatibilidade com Electron (file://) e deploys estáticos
-  base: './',
+  // Se estiver gerando build do Electron (file://), usa relativo './'. Na Vercel/Web, usa '/'
+  base: process.env.ELECTRON_BUILD ? './' : '/',
   build: {
     rollupOptions: {
       input: {
