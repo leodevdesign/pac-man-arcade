@@ -1,0 +1,860 @@
+:root {
+  --arcade-black: #000000;
+  --arcade-blue: #2121de;
+  --pacman-yellow: #ffff00;
+  --ghost-red: #ff0000;
+  --ghost-pink: #ffb8ff;
+  --ghost-cyan: #00ffff;
+  --ghost-orange: #ffb852;
+  --bg-dark: #070714;
+  --panel-bg: #121226;
+  --panel-border: #2c2c54;
+  --neon-cyan: #00ffff;
+  --neon-magenta: #ff007f;
+  --font-arcade: 'Press Start 2P', monospace;
+  --font-ui: 'Chakra Petch', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+/* Barra de rolagem estilizada */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(10, 10, 25, 0.7);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #00ffff;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff00ea;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: var(--font-ui);
+  color: #ffffff;
+  font-size: 15px; /* Fonte base nítida e confortável */
+  letter-spacing: 0.5px;
+}
+
+/* =========================================================================
+ * 🕹️ LAYOUT PRINCIPAL DE 3 COLUNAS
+ * ========================================================================= */
+.main-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr 310px;
+  width: 100vw;
+  height: 100vh;
+  padding: 12px 16px;
+  gap: 16px;
+}
+
+/* Painéis Laterais */
+.arcade-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Cards dos Painéis */
+.info-card {
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-card-title {
+  font-family: var(--font-arcade);
+  font-size: 13px;
+  color: var(--neon-cyan);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #252548;
+  padding-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.control-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: #a5a5cc;
+  text-transform: uppercase;
+}
+
+.map-select {
+  background: #090916;
+  border: 2px solid #3c3c66;
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 12px;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.map-select:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00f0ff 0%, #0077b6 100%);
+  color: #000000;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 800;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.7);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #1c1c38;
+  color: #c0c0e8;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1.5px solid #3e3e68;
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background: #2b2b52;
+  color: #ffffff;
+  border-color: #00ffff;
+}
+
+.action-btn {
+  background: #16162e;
+  border: 1.5px solid #34345c;
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn:hover {
+  background: #24244a;
+  border-color: var(--neon-cyan);
+}
+
+.action-btn.active {
+  background: #004d40;
+  border-color: #00e676;
+  color: #69f0ae;
+}
+
+/* =========================================================================
+ * 🟡 GABINETE ARCADE CENTRAL
+ * ========================================================================= */
+.arcade-center-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  overflow: hidden;
+}
+
+.arcade-header-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.arcade-title {
+  font-family: var(--font-arcade);
+  color: var(--pacman-yellow);
+  font-size: 2.2rem;
+  letter-spacing: 6px;
+  text-shadow: 0 0 15px rgba(255, 255, 0, 0.9), 0 0 30px rgba(255, 184, 0, 0.6);
+}
+
+.cabinet-bezel {
+  height: calc(100vh - 65px);
+  aspect-ratio: 224 / 288;
+  max-width: 100%;
+  background: #000000;
+  border: 4px solid #2121de;
+  box-shadow: 0 0 0 4px #000, 0 0 35px rgba(33, 33, 222, 0.5), 0 15px 50px rgba(0, 0, 0, 0.95);
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.scanlines-on::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Informações de Fantasmas, Power-ups e Controles */
+.ghost-list, .controls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ghost-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ghost-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.ghost-blinky { background: var(--ghost-red); box-shadow: 0 0 8px var(--ghost-red); }
+.ghost-pinky { background: var(--ghost-pink); box-shadow: 0 0 8px var(--ghost-pink); }
+.ghost-inky { background: var(--ghost-cyan); box-shadow: 0 0 8px var(--ghost-cyan); }
+.ghost-clyde { background: var(--ghost-orange); box-shadow: 0 0 8px var(--ghost-orange); }
+
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #b0b0d8;
+}
+
+.key-tag {
+  background: #1c1c34;
+  color: var(--pacman-yellow);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #444470;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================================
+ * 🏆 MODAIS DE JOGO (Conquistas, Lojinha, Recordes, Editor)
+ * ========================================================================= */
+.editor-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(3, 3, 10, 0.92);
+  backdrop-filter: blur(14px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.editor-modal.open {
+  display: flex;
+}
+
+.editor-content {
+  background: #0f0f22;
+  border: 2px solid #2121de;
+  box-shadow: 0 0 45px rgba(33, 33, 222, 0.4), 0 20px 60px rgba(0, 0, 0, 0.95);
+  border-radius: 14px;
+  padding: 20px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editor-content.modal-fullscreen {
+  max-width: 95vw;
+  width: 95vw;
+  max-height: 92vh;
+}
+
+.editor-content.modal-wide {
+  max-width: 860px;
+}
+
+.editor-content.modal-compact {
+  max-width: 480px;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 12px;
+}
+
+.editor-title {
+  font-family: var(--font-arcade);
+  color: #ffff00;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+}
+
+.editor-close {
+  background: transparent;
+  border: none;
+  color: #ff5252;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.2s ease;
+}
+
+.editor-close:hover {
+  transform: scale(1.2);
+}
+
+.coins-pill {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1.5px solid #ffd700;
+  color: #ffd700;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 16px;
+}
+
+/* =========================================================================
+ * 🌟 CARDS DE CONQUISTAS GRANDES, ESPAÇOSOS E 100% LEGÍVEIS
+ * ========================================================================= */
+.achievement-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 12px;
+}
+
+.ach-filter-btn, .shop-tab-btn {
+  background: #181832;
+  border: 1.5px solid #383860;
+  color: #b0b0d8;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ach-filter-btn:hover, .shop-tab-btn:hover {
+  background: #282852;
+  color: #ffffff;
+}
+
+.ach-filter-btn.active, .shop-tab-btn.active {
+  background: #00ffff;
+  color: #000000;
+  border-color: #00ffff;
+  font-weight: 900;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+}
+
+/* Grid Espaçoso (Cards de 300px+) */
+.achievements-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.ach-card-spacious {
+  background: #14142a;
+  border: 2px solid #2c2c54;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.ach-card-spacious:hover {
+  border-color: #00ffff;
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.ach-card-spacious.card-active {
+  border-color: #00e676;
+}
+
+.ach-card-spacious.card-mastered {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.06);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+}
+
+.ach-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ach-card-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ach-card-emoji {
+  font-size: 1.6rem;
+}
+
+.ach-card-text-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ach-card-name {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ach-card-cat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8888b4;
+  letter-spacing: 0.5px;
+}
+
+.ach-card-stars-box {
+  display: flex;
+  gap: 2px;
+}
+
+.ach-big-star {
+  font-size: 1.2rem;
+}
+
+.ach-big-star.gold {
+  color: #ffd700;
+  text-shadow: 0 0 8px #ffd700;
+}
+
+.ach-big-star.dim {
+  color: #38385c;
+}
+
+.ach-card-middle {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.ach-mission-current {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ach-tier-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: #00ffff;
+  text-transform: uppercase;
+}
+
+.ach-mission-goal {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0ff;
+  line-height: 1.35;
+}
+
+.ach-mission-complete {
+  color: #69f0ae;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.ach-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ach-bar-track {
+  background: rgba(255, 255, 255, 0.08);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 255, 255, 0.25);
+}
+
+.ach-bar-fill {
+  background: linear-gradient(90deg, #00ffff, #ff00ea);
+  height: 100%;
+}
+
+.ach-bar-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ach-bar-numbers {
+  font-size: 13px;
+  font-weight: 700;
+  color: #c0c0e8;
+}
+
+.ach-reward-tag {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid #ffd700;
+  color: #ffd700;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* =========================================================================
+ * 🏪 LOJINHA DE UPGRADES E SKINS
+ * ========================================================================= */
+.shop-tabs-nav {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 12px;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.shop-card {
+  background: #14142a;
+  border: 2px solid #2c2c54;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shop-card.mastered {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.shop-card.equipped {
+  border-color: #00e676;
+  background: rgba(0, 230, 118, 0.06);
+}
+
+.shop-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop-card-icon {
+  font-size: 1.8rem;
+}
+
+.shop-card-title-box {
+  flex: 1;
+}
+
+.shop-card-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.shop-card-level-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  margin-top: 2px;
+}
+
+.shop-card-status {
+  font-size: 13px;
+  font-weight: 700;
+  color: #00e676;
+  margin-top: 2px;
+}
+
+.shop-card-desc {
+  font-size: 14px;
+  font-weight: 500;
+  color: #a8a8cc;
+  line-height: 1.4;
+}
+
+.shop-card-effect {
+  font-size: 13px;
+  font-weight: 700;
+  color: #69f0ae;
+  background: rgba(0, 230, 118, 0.1);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 230, 118, 0.25);
+}
+
+.shop-progress-bar {
+  background: rgba(255, 255, 255, 0.08);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 255, 255, 0.25);
+}
+
+.shop-progress-fill {
+  background: linear-gradient(90deg, #00f0ff, #ff007f);
+  height: 100%;
+}
+
+.shop-action-btn {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-top: auto;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.btn-buy {
+  background: linear-gradient(135deg, #00f0ff 0%, #0088cc 100%);
+  color: #000000;
+}
+.btn-buy:hover {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.7);
+}
+
+.btn-equip {
+  background: #ff007f;
+  color: #ffffff;
+}
+.btn-equip:hover {
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.7);
+}
+
+.btn-equipped {
+  background: #00e676;
+  color: #000000;
+  cursor: default;
+}
+
+.btn-max {
+  background: #ffd700;
+  color: #000000;
+  cursor: default;
+}
+
+.btn-disabled {
+  background: #22223a;
+  color: #666688;
+  cursor: not-allowed;
+}
+
+/* Toast de Conquistas */
+.achievement-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: rgba(14, 14, 30, 0.98);
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 35px rgba(255, 215, 0, 0.6);
+  border-radius: 12px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 300;
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.achievement-toast.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.achievement-icon {
+  font-size: 2rem;
+}
+
+.achievement-header {
+  font-family: var(--font-arcade);
+  color: #ffd700;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.achievement-name {
+  font-family: var(--font-ui);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  margin: 3px 0;
+}
+
+.achievement-desc {
+  font-size: 14px;
+  font-weight: 700;
+  color: #69f0ae;
+}
+
+/* Tabela de Recordes */
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.leaderboard-table th {
+  border-bottom: 2px solid #33335c;
+  padding: 10px 8px;
+  text-align: left;
+  color: #ffd700;
+  font-family: var(--font-arcade);
+  font-size: 13px;
+}
+
+.leaderboard-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #1c1c34;
+}
+
+/* Temas Visuais */
+body.theme-synthwave {
+  background-color: #0d001a;
+  background-image: 
+    radial-gradient(circle at 50% 30%, #2b0054 0%, #080014 80%),
+    linear-gradient(rgba(255, 0, 127, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+}
+body.theme-synthwave .arcade-title {
+  color: #00ffff;
+  text-shadow: 0 0 15px #ff007f, 0 0 30px #00ffff;
+}
+
+body.theme-matrix {
+  background-color: #020b04;
+  background-image: 
+    radial-gradient(circle at 50% 30%, #06240d 0%, #020b04 80%),
+    linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
+}
+body.theme-matrix .arcade-title {
+  color: #00ff66;
+  text-shadow: 0 0 15px #00ff66, 0 0 30px rgba(0, 255, 102, 0.6);
+}
+
+body.theme-gameboy {
+  background-color: #8bac0f;
+  background-image: none;
+  color: #0f380f;
+}
+body.theme-gameboy .arcade-title {
+  color: #0f380f;
+  text-shadow: none;
+}
+body.theme-gameboy .cabinet-bezel {
+  background: #9bbc0f;
+}
