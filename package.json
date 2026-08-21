@@ -3,13 +3,64 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "electron/main.cjs",
+  "author": {
+    "name": "Next Automatik",
+    "url": "https://github.com/leodevdesign"
+  },
+  "description": "Pac-Man Arcade Definitive Edition — A lenda dos arcades, totalmente reinventada com IA autêntica, 150 conquistas, loja de upgrades, estúdio de labirintos e 5 modos de jogo.",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "npm run build && electron .",
+    "electron:build": "npm run build && electron-builder --win --x64",
+    "electron:build:dir": "npm run build && electron-builder --win --x64 --dir"
+  },
+  "build": {
+    "appId": "com.nextautomatik.pacman-arcade",
+    "productName": "Pac-Man Arcade",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Pac-Man Arcade",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "leodevdesign",
+      "repo": "pac-man-arcade"
+    }
   },
   "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.0",
     "playwright": "^1.62.1",
+    "png-to-ico": "^3.0.2",
     "typescript": "^5.4.5",
     "vite": "^5.2.11"
   }
