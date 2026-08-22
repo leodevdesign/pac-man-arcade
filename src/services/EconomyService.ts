@@ -8,6 +8,8 @@ export interface MultiLevelUpgrades {
   bombDuration: number;        // 0 a 4 (Duração de atordoamento: 1s, 2s, 3s, 4s)
   shieldCharges: number;       // 0 a 4 (Cargas de colisão absorvidas: 1, 2, 3, 4 defesas)
   freezeDuration: number;      // 0 a 5 (Tempo de congelamento: 1s, 2s, 3s, 4s, 5s)
+  speedBoost: number;          // 0 a 15 (+1% por nível, até +15% de velocidade)
+  coinMultiplier: number;      // 0 a 25 (+2% por nível, até +50% de moedas)
 }
 
 export interface UpgradeDefinition {
@@ -31,6 +33,26 @@ export const UPGRADE_DEFINITIONS: UpgradeDefinition[] = [
     basePrice: 400,
     priceStep: 400,
     getEffectLabel: (lvl) => (lvl === 0 ? '3 Vidas Iniciais' : `${3 + lvl} Vidas Iniciais`),
+  },
+  {
+    key: 'speedBoost',
+    title: '👟 Tênis Turbo (Agilidade)',
+    desc: 'Aumenta a velocidade de corrida do Pac-Man (+1% por nível, até +15%).',
+    icon: '👟',
+    maxLevel: 15,
+    basePrice: 60,
+    priceStep: 25,
+    getEffectLabel: (lvl) => (lvl === 0 ? 'Velocidade Padrão' : `+${lvl}% de Velocidade`),
+  },
+  {
+    key: 'coinMultiplier',
+    title: '🪙 Detector de Ouro (Bônus)',
+    desc: 'Multiplicador de moedas obtidas em fases, recordes e missões (+2% por nível).',
+    icon: '🪙',
+    maxLevel: 25,
+    basePrice: 50,
+    priceStep: 20,
+    getEffectLabel: (lvl) => (lvl === 0 ? 'Moedas Padrão (0%)' : `+${lvl * 2}% de Moedas Bônus`),
   },
   {
     key: 'boostedFruits',
@@ -173,6 +195,8 @@ export class EconomyService {
     bombDuration: 0,
     shieldCharges: 0,
     freezeDuration: 0,
+    speedBoost: 0,
+    coinMultiplier: 0,
   };
 
   private onCoinsChangedCallbacks: ((coins: number) => void)[] = [];
@@ -198,8 +222,10 @@ export class EconomyService {
   }
 
   public addCoins(amount: number) {
-    this.coins += amount;
-    this.totalCoinsEarned += amount;
+    const bonusMult = 1 + (this.getUpgradeLevel('coinMultiplier') * 0.02);
+    const finalAmount = Math.max(1, Math.round(amount * bonusMult));
+    this.coins += finalAmount;
+    this.totalCoinsEarned += finalAmount;
     this.saveToStorage();
     this.notifyCoinsChanged();
   }
@@ -258,6 +284,10 @@ export class EconomyService {
   // Getters diretos para as mecânicas de gameplay
   public getStartingLives(): number {
     return 3 + this.upgrades.extraLives;
+  }
+
+  public getSpeedMultiplier(): number {
+    return 1.0 + (this.getUpgradeLevel('speedBoost') * 0.01);
   }
 
   public getFruitBonusMultiplier(): number {

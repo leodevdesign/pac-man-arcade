@@ -277,16 +277,17 @@ export class Game {
 
   private applyLevelDifficulty() {
     const speedMult = this.gameMode === GameMode.TURBO ? 1.8 : 1.0;
+    const upgradeSpeed = this.economyService.getSpeedMultiplier();
 
     if (this.level === 1) {
-      this.pacman.speed = BASE_SPEED * 0.8 * speedMult;
-      this.pacman2.speed = BASE_SPEED * 0.8 * speedMult;
+      this.pacman.speed = BASE_SPEED * 0.8 * speedMult * upgradeSpeed;
+      this.pacman2.speed = BASE_SPEED * 0.8 * speedMult * upgradeSpeed;
     } else if (this.level <= 4) {
-      this.pacman.speed = BASE_SPEED * 0.9 * speedMult;
-      this.pacman2.speed = BASE_SPEED * 0.9 * speedMult;
+      this.pacman.speed = BASE_SPEED * 0.9 * speedMult * upgradeSpeed;
+      this.pacman2.speed = BASE_SPEED * 0.9 * speedMult * upgradeSpeed;
     } else {
-      this.pacman.speed = BASE_SPEED * 1.0 * speedMult;
-      this.pacman2.speed = BASE_SPEED * 1.0 * speedMult;
+      this.pacman.speed = BASE_SPEED * 1.0 * speedMult * upgradeSpeed;
+      this.pacman2.speed = BASE_SPEED * 1.0 * speedMult * upgradeSpeed;
     }
 
     let baseDuration = 6000;
