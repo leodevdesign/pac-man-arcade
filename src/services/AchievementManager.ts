@@ -1,4 +1,5 @@
 import { SoundSynthesizer } from '../audio/SoundSynthesizer.ts';
+import { SaveService } from './SaveService.ts';
 
 export interface AchievementTier {
   tier: 1 | 2 | 3;
@@ -869,13 +870,13 @@ export class AchievementManager {
           tiers: ach.tiers.map((t) => t.unlocked),
         };
       });
-      localStorage.setItem('pacman_progressive_achievements_v2', JSON.stringify(state));
+      SaveService.setItem('pacman_progressive_achievements_v2', JSON.stringify(state));
     } catch {}
   }
 
   private loadFromStorage() {
     try {
-      const saved = localStorage.getItem('pacman_progressive_achievements_v2');
+      const saved = SaveService.getItem('pacman_progressive_achievements_v2');
       if (saved) {
         const state = JSON.parse(saved);
         Object.entries(state).forEach(([id, data]: [string, any]) => {

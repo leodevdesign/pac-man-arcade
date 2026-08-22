@@ -1,3 +1,5 @@
+import { SaveService } from './SaveService.ts';
+
 export interface HighScoreEntry {
   rank?: number;
   initials: string;
@@ -47,11 +49,11 @@ export class LeaderboardService {
   }
 
   private save() {
-    localStorage.setItem(LeaderboardService.STORAGE_KEY, JSON.stringify(this.entries));
+    SaveService.setItem(LeaderboardService.STORAGE_KEY, JSON.stringify(this.entries));
   }
 
   private load() {
-    const saved = localStorage.getItem(LeaderboardService.STORAGE_KEY);
+    const saved = SaveService.getItem(LeaderboardService.STORAGE_KEY);
     if (saved) {
       try {
         this.entries = JSON.parse(saved);

@@ -1,4 +1,5 @@
 import { PacmanSkin } from '../core/Constants.ts';
+import { SaveService } from './SaveService.ts';
 
 export interface MultiLevelUpgrades {
   extraLives: number;          // 0 a 2 (Inicia com 3, 4 ou 5 vidas)
@@ -319,20 +320,20 @@ export class EconomyService {
   }
 
   private saveToStorage() {
-    localStorage.setItem('pacman_coins', this.coins.toString());
-    localStorage.setItem('pacman_total_coins', this.totalCoinsEarned.toString());
-    localStorage.setItem('pacman_unlocked_skins', JSON.stringify(Array.from(this.unlockedSkins)));
-    localStorage.setItem('pacman_multilevel_upgrades', JSON.stringify(this.upgrades));
+    SaveService.setItem('pacman_coins', this.coins.toString());
+    SaveService.setItem('pacman_total_coins', this.totalCoinsEarned.toString());
+    SaveService.setItem('pacman_unlocked_skins', JSON.stringify(Array.from(this.unlockedSkins)));
+    SaveService.setItem('pacman_multilevel_upgrades', JSON.stringify(this.upgrades));
   }
 
   private loadFromStorage() {
-    const savedCoins = localStorage.getItem('pacman_coins');
+    const savedCoins = SaveService.getItem('pacman_coins');
     if (savedCoins) this.coins = parseInt(savedCoins, 10) || 0;
 
-    const savedTotal = localStorage.getItem('pacman_total_coins');
+    const savedTotal = SaveService.getItem('pacman_total_coins');
     if (savedTotal) this.totalCoinsEarned = parseInt(savedTotal, 10) || 0;
 
-    const savedSkins = localStorage.getItem('pacman_unlocked_skins');
+    const savedSkins = SaveService.getItem('pacman_unlocked_skins');
     if (savedSkins) {
       try {
         const arr = JSON.parse(savedSkins);
@@ -341,7 +342,7 @@ export class EconomyService {
       } catch {}
     }
 
-    const savedUpgrades = localStorage.getItem('pacman_multilevel_upgrades');
+    const savedUpgrades = SaveService.getItem('pacman_multilevel_upgrades');
     if (savedUpgrades) {
       try {
         this.upgrades = { ...this.upgrades, ...JSON.parse(savedUpgrades) };

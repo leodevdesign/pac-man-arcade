@@ -8,14 +8,19 @@ import { ShopModal } from './ui/ShopModal.ts';
 import { AchievementsModal } from './ui/AchievementsModal.ts';
 import { LeaderboardModal } from './ui/LeaderboardModal.ts';
 import { CustomSelect } from './ui/CustomSelect.ts';
+import { SaveService } from './services/SaveService.ts';
+import { UpdaterUI } from './ui/UpdaterUI.ts';
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+  await SaveService.init();
+
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
   if (!canvas) {
     console.error('Canvas #gameCanvas não foi encontrado no DOM.');
     return;
   }
 
+  new UpdaterUI();
   const game = new Game(canvas);
 
   // 1. Modais de Lojinha, Conquistas e Recordes

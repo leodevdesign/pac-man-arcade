@@ -1223,3 +1223,119 @@ body.theme-gameboy .arcade-title {
   color: #0f380f;
   text-shadow: none;
 }
+
+/* =========================================================================
+ * 🚀 IN-GAME AUTO-UPDATER BANNER (Design Neon Futurista)
+ * ========================================================================= */
+.ingame-update-banner {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: rgba(18, 7, 36, 0.95);
+  border: 1.5px solid #a855f7;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.4), 0 10px 30px rgba(0, 0, 0, 0.9);
+  padding: 10px 18px;
+  max-width: 680px;
+  width: 90%;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ingame-update-banner.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -20px);
+  pointer-events: none;
+}
+
+.update-banner-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.update-banner-content.download-mode {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.update-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.update-title {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.update-sub {
+  font-size: 12px;
+  color: #c084fc;
+}
+
+.update-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-update-action, .btn-update-restart {
+  background: linear-gradient(135deg, #00e676 0%, #00b0ff 100%);
+  border: none;
+  color: #051408;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-update-action:hover, .btn-update-restart:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 22px rgba(0, 230, 118, 0.7);
+}
+
+.btn-update-close {
+  background: transparent;
+  border: none;
+  color: #a5a5cc;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: color 0.2s ease;
+}
+
+.btn-update-close:hover {
+  color: #ff5252;
+}
+
+.update-progress-bar-track {
+  background: rgba(255, 255, 255, 0.1);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.update-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00e676, #00b0ff);
+  transition: width 0.3s ease;
+}
+
