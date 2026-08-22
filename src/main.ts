@@ -10,6 +10,8 @@ import { LeaderboardModal } from './ui/LeaderboardModal.ts';
 import { CustomSelect } from './ui/CustomSelect.ts';
 import { SaveService } from './services/SaveService.ts';
 import { UpdaterUI } from './ui/UpdaterUI.ts';
+import { ProfileCard } from './ui/ProfileCard.ts';
+import { ChestModal } from './ui/ChestModal.ts';
 
 window.addEventListener('DOMContentLoaded', async () => {
   await SaveService.init();
@@ -23,10 +25,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   new UpdaterUI();
   const game = new Game(canvas);
 
-  // 1. Modais de Lojinha, Conquistas e Recordes
+  // 1. Perfil, Baú e Modais
+  const profileCard = new ProfileCard(game.profileService);
+  new ChestModal(game.profileService, game.economyService, game.sound);
   const shopModal = new ShopModal(game.economyService, game.themeManager);
+
   shopModal.onSkinEquipped((skin) => {
     game.setPacmanSkin(skin);
+    profileCard.setSkin(skin);
     const skinSelect = document.getElementById('skinSelect') as HTMLSelectElement;
     if (skinSelect) skinSelect.value = skin;
   });
@@ -126,6 +132,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const selectedSkin = val as PacmanSkin;
     if (game.economyService.isSkinUnlocked(selectedSkin)) {
       game.setPacmanSkin(selectedSkin);
+      profileCard.setSkin(selectedSkin);
     } else {
       alert('Essa skin ainda está bloqueada! Desbloqueie na Lojinha de Upgrades com moedas.');
       shopModal.open();

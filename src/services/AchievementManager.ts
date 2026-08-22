@@ -2,10 +2,11 @@ import { SoundSynthesizer } from '../audio/SoundSynthesizer.ts';
 import { SaveService } from './SaveService.ts';
 
 export interface AchievementTier {
-  tier: 1 | 2 | 3;
+  tier: 1 | 2 | 3 | 4 | 5;
   target: number;
   name: string;
   rewardCoins: number;
+  rewardXp: number;
   unlocked: boolean;
   unlockedAt?: string;
 }
@@ -18,13 +19,90 @@ export interface ProgressiveAchievement {
   category: 'pastilhas' | 'fantasmas' | 'frutas' | 'sobrevivencia' | 'pontos' | 'economia' | 'powerups' | 'modos';
   currentValue: number;
   unit: string;
-  tiers: [AchievementTier, AchievementTier, AchievementTier];
+  tiers: AchievementTier[];
 }
+
+interface RawAchDef {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  category: ProgressiveAchievement['category'];
+  unit: string;
+  targets: [number, number, number, number, number];
+  coins: [number, number, number, number, number];
+  xp: [number, number, number, number, number];
+}
+
+const TIER_NAMES = ['Bronze ⭐', 'Prata ⭐⭐', 'Ouro ⭐⭐⭐', 'Platina 💎', 'Mítico 👑'];
+
+const RAW_ACHIEVEMENTS: RawAchDef[] = [
+  // 1. PASTILHAS & LABIRINTO (1-10)
+  { id: 'dots_eaten', title: 'Comilão de Pastilhas', description: 'Devore pastilhas amarelas pelo labirinto', icon: '🟡', category: 'pastilhas', unit: 'pastilhas', targets: [500, 5000, 25000, 100000, 500000], coins: [50, 250, 1000, 5000, 25000], xp: [100, 300, 1000, 3000, 10000] },
+  { id: 'energizers_eaten', title: 'Pílula do Poder', description: 'Consuma pílulas Energizer para assustar fantasmas', icon: '⚪', category: 'pastilhas', unit: 'energizers', targets: [10, 100, 500, 2500, 10000], coins: [40, 200, 800, 4000, 20000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'level_clears', title: 'Desbravador de Fases', description: 'Conclua fases completas no jogo', icon: '🚩', category: 'pastilhas', unit: 'fases', targets: [1, 10, 50, 200, 1000], coins: [50, 300, 1200, 6000, 30000], xp: [150, 400, 1500, 5000, 15000] },
+  { id: 'single_run_dots', title: 'Limpeza Impecável', description: 'Coma pastilhas acumuladas numa única partida', icon: '🧹', category: 'pastilhas', unit: 'pastilhas', targets: [244, 1000, 5000, 15000, 50000], coins: [50, 200, 800, 3500, 15000], xp: [100, 300, 1000, 3000, 10000] },
+  { id: 'waka_master', title: 'Ritmo Waka-Waka', description: 'Emita sons de mastigada waka-waka', icon: '🗣️', category: 'pastilhas', unit: 'mordidas', targets: [500, 5000, 25000, 100000, 500000], coins: [40, 200, 800, 4000, 20000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'speed_clear', title: 'Limpeza Relâmpago', description: 'Conclua fases em ritmo super acelerado', icon: '⏱️', category: 'pastilhas', unit: 'fases rápidas', targets: [1, 5, 25, 100, 500], coins: [60, 250, 1000, 5000, 25000], xp: [150, 350, 1200, 4000, 12000] },
+  { id: 'no_energizer_clear', title: 'Desafio Puro', description: 'Conclua fases sem comer nenhum Energizer', icon: '🥋', category: 'pastilhas', unit: 'fases puras', targets: [1, 5, 20, 80, 300], coins: [80, 400, 1500, 7000, 35000], xp: [200, 500, 2000, 6000, 20000] },
+  { id: 'corners_taken', title: 'Mestre das Curvas', description: 'Execute curvas perfeitas nas esquinas', icon: '🔄', category: 'pastilhas', unit: 'curvas', targets: [50, 500, 2500, 10000, 50000], coins: [30, 150, 600, 3000, 15000], xp: [100, 200, 600, 2000, 6000] },
+  { id: 'tunnel_warps', title: 'Viajante dos Túneis', description: 'Atravesse os túneis laterais de teletransporte', icon: '🌀', category: 'pastilhas', unit: 'travessias', targets: [10, 100, 500, 2000, 10000], coins: [30, 150, 600, 3000, 15000], xp: [100, 200, 600, 2000, 6000] },
+  { id: 'flawless_board', title: 'Varredura Perfeita', description: 'Limpe labirintos sem colidir com paredes', icon: '✨', category: 'pastilhas', unit: 'fases perfeitas', targets: [1, 5, 25, 100, 500], coins: [100, 500, 2000, 8000, 40000], xp: [250, 600, 2500, 8000, 25000] },
+
+  // 2. FANTASMAS (11-20)
+  { id: 'ghosts_eaten_total', title: 'Devorador de Espectros', description: 'Devore fantasmas azuis assustados', icon: '👻', category: 'fantasmas', unit: 'fantasmas', targets: [10, 100, 500, 2500, 10000], coins: [50, 250, 1000, 5000, 25000], xp: [100, 300, 1200, 4000, 12000] },
+  { id: 'quad_combos', title: 'Caçador Supremo (4-Combo)', description: 'Coma os 4 fantasmas numa única pílula', icon: '⚡', category: 'fantasmas', unit: 'combos 4x', targets: [1, 10, 50, 250, 1000], coins: [100, 500, 2000, 8000, 40000], xp: [250, 600, 2500, 8000, 25000] },
+  { id: 'blinky_slayer', title: 'Pesadelo do Blinky', description: 'Devore o fantasma vermelho Blinky', icon: '🔴', category: 'fantasmas', unit: 'Blinkys', targets: [5, 50, 250, 1000, 5000], coins: [40, 200, 800, 4000, 20000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'pinky_slayer', title: 'Emboscada Invertida', description: 'Devore a fantasma rosa Pinky', icon: '🌸', category: 'fantasmas', unit: 'Pinkys', targets: [5, 50, 250, 1000, 5000], coins: [40, 200, 800, 4000, 20000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'inky_slayer', title: 'Falso Reflexo', description: 'Devore o fantasma ciano Inky', icon: '🔷', category: 'fantasmas', unit: 'Inkys', targets: [5, 50, 250, 1000, 5000], coins: [40, 200, 800, 4000, 20000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'clyde_slayer', title: 'Covardia Paga', description: 'Devore o fantasma laranja Clyde', icon: '🍊', category: 'fantasmas', unit: 'Clydes', targets: [5, 50, 250, 1000, 5000], coins: [40, 200, 800, 4000, 20000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'double_combos', title: 'Combo Duplo (2-Combo)', description: 'Devore 2 fantasmas na mesma pílula', icon: '✌️', category: 'fantasmas', unit: 'combos 2x', targets: [10, 100, 500, 2000, 10000], coins: [40, 200, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'triple_combos', title: 'Combo Triplo (3-Combo)', description: 'Devore 3 fantasmas na mesma pílula', icon: '🎯', category: 'fantasmas', unit: 'combos 3x', targets: [5, 50, 250, 1000, 5000], coins: [60, 300, 1200, 5000, 25000], xp: [150, 350, 1200, 4000, 12000] },
+  { id: 'last_second_eats', title: 'No Fio da Navalha', description: 'Devore fantasmas nos últimos segundos azuis', icon: '⏳', category: 'fantasmas', unit: 'comidas arriscadas', targets: [3, 25, 100, 500, 2000], coins: [50, 250, 1000, 5000, 25000], xp: [100, 300, 1200, 4000, 12000] },
+  { id: 'cruise_elroy_survived', title: 'Fúria do Elroy', description: 'Sobreviva ao modo Cruise Elroy acelerado', icon: '🔥', category: 'fantasmas', unit: 'sobrevivências', targets: [1, 5, 25, 100, 500], coins: [50, 250, 1000, 4500, 22000], xp: [100, 300, 1000, 3500, 10000] },
+
+  // 3. FRUTAS & GULOSEIMAS (21-30)
+  { id: 'fruits_eaten_total', title: 'Banquete de Frutas', description: 'Colete itens bônus frutados no mapa', icon: '🍒', category: 'frutas', unit: 'frutas', targets: [5, 50, 250, 1000, 5000], coins: [50, 250, 1000, 5000, 25000], xp: [100, 300, 1200, 4000, 12000] },
+  { id: 'cherry_lover', title: 'Cereja Clássica', description: 'Devore pares de cerejas suculentas', icon: '🍒', category: 'frutas', unit: 'cerejas', targets: [5, 25, 100, 500, 2000], coins: [40, 200, 700, 3000, 15000], xp: [100, 200, 700, 2000, 7000] },
+  { id: 'strawberry_lover', title: 'Morangos Doces', description: 'Devore morangos frescos nas fases', icon: '🍓', category: 'frutas', unit: 'morangos', targets: [5, 25, 100, 500, 2000], coins: [40, 200, 700, 3000, 15000], xp: [100, 200, 700, 2000, 7000] },
+  { id: 'orange_lover', title: 'Laranja Cítrica', description: 'Devore laranjas saborosas', icon: '🍊', category: 'frutas', unit: 'laranjas', targets: [5, 25, 100, 500, 2000], coins: [50, 250, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'apple_lover', title: 'Maçã Crocante', description: 'Devore maçãs vermelhas', icon: '🍎', category: 'frutas', unit: 'maçãs', targets: [5, 25, 100, 500, 2000], coins: [50, 250, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'melon_lover', title: 'Melão Refrescante', description: 'Devore melões saborosos', icon: '🍈', category: 'frutas', unit: 'melões', targets: [5, 25, 100, 500, 2000], coins: [60, 300, 1000, 4500, 22000], xp: [120, 300, 1000, 3000, 10000] },
+  { id: 'galaxian_boss', title: 'Nave Galaxian', description: 'Colete a lendária insígnia da Galaxian', icon: '🚀', category: 'frutas', unit: 'Galaxians', targets: [3, 15, 60, 250, 1000], coins: [80, 400, 1500, 6000, 30000], xp: [150, 400, 1500, 4500, 15000] },
+  { id: 'bell_collector', title: 'Sino de Ouro', description: 'Toque e devore o sino dourado', icon: '🔔', category: 'frutas', unit: 'sinos', targets: [3, 15, 60, 250, 1000], coins: [100, 500, 2000, 8000, 40000], xp: [200, 500, 2000, 6000, 20000] },
+  { id: 'key_master', title: 'Chave Lendária (5.000 pts)', description: 'Colete o item máximo: a Chave Sagrada', icon: '🔑', category: 'frutas', unit: 'chaves', targets: [1, 5, 25, 100, 500], coins: [150, 750, 3000, 12000, 60000], xp: [300, 800, 3000, 10000, 30000] },
+  { id: 'all_fruits_run', title: 'Pomar Completo', description: 'Colete todas as frutas de uma única partida', icon: '🧺', category: 'frutas', unit: 'partidas perfeitas', targets: [1, 5, 20, 80, 300], coins: [100, 500, 2000, 8000, 40000], xp: [200, 500, 2000, 6000, 20000] },
+
+  // 4. PONTUAÇÃO & RECORDES (31-40)
+  { id: 'total_points_accumulated', title: 'Pontuador Nato', description: 'Pontos acumulados em toda carreira', icon: '💯', category: 'pontos', unit: 'pontos', targets: [50000, 500000, 2500000, 10000000, 50000000], coins: [50, 250, 1000, 5000, 25000], xp: [100, 300, 1200, 4000, 12000] },
+  { id: 'high_score_tier', title: 'Recordista de Elite', description: 'Atinja pontuações altas numa partida', icon: '🏆', category: 'pontos', unit: 'recorde', targets: [10000, 50000, 150000, 500000, 1500000], coins: [100, 500, 2000, 8000, 40000], xp: [250, 600, 2500, 8000, 25000] },
+  { id: 'coins_earned_total', title: 'Magnata do Fliperama', description: 'Acumule moedas totais no jogo', icon: '🪙', category: 'economia', unit: 'moedas', targets: [5000, 25000, 100000, 500000, 2500000], coins: [100, 500, 2000, 10000, 50000], xp: [200, 500, 2000, 8000, 25000] },
+  { id: 'piggy_bank_saved', title: 'Cofre Lotado', description: 'Mantenha moedas guardadas na carteira', icon: '🏦', category: 'economia', unit: 'saldo', targets: [5000, 20000, 80000, 300000, 1000000], coins: [80, 400, 1600, 7000, 35000], xp: [150, 400, 1600, 6000, 20000] },
+  { id: 'upgrades_purchased', title: 'Mestre dos Aprimoramentos', description: 'Compre níveis de upgrades na Loja', icon: '🛠️', category: 'economia', unit: 'upgrades', targets: [5, 25, 75, 150, 250], coins: [100, 500, 2000, 8000, 40000], xp: [200, 500, 2000, 7000, 25000] },
+  { id: 'skins_unlocked', title: 'Guarda-Roupa Arcade', description: 'Desbloqueie skins estilosas do Pac-Man', icon: '🎭', category: 'economia', unit: 'skins', targets: [1, 3, 5, 7, 8], coins: [100, 400, 1500, 5000, 20000], xp: [200, 500, 1500, 5000, 15000] },
+  { id: 'consecutive_survivals', title: 'Invencibilidade', description: 'Passe fases consecutivas sem morrer', icon: '🛡️', category: 'sobrevivencia', unit: 'fases sem morrer', targets: [2, 5, 12, 30, 100], coins: [80, 400, 1800, 7500, 35000], xp: [200, 500, 2000, 7000, 25000] },
+  { id: 'near_death_escapes', title: 'Escape Milagroso', description: 'Desvie de fantasmas a 1 tile de distância', icon: '💨', category: 'sobrevivencia', unit: 'escapes', targets: [5, 25, 100, 500, 2000], coins: [40, 200, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'turbo_clears', title: 'Piloto Supersônico', description: 'Conclua fases no veloz Modo Turbo 2x', icon: '⚡', category: 'modos', unit: 'fases turbo', targets: [1, 5, 25, 100, 500], coins: [60, 300, 1200, 5000, 25000], xp: [150, 350, 1200, 4000, 15000] },
+  { id: 'hunter_wins', title: 'Terror dos Fantasmas', description: 'Vença no Modo Invertido Ghost Hunter', icon: '😈', category: 'modos', unit: 'vitórias', targets: [1, 5, 25, 100, 500], coins: [60, 300, 1200, 5000, 25000], xp: [150, 350, 1200, 4000, 15000] },
+
+  // 5. POWER-UPS & MULTIPLAYER (41-50)
+  { id: 'shield_blocks', title: 'Armadura Reluzente', description: 'Absorva colisões com o Escudo de Energia', icon: '🛡️', category: 'powerups', unit: 'defesas', targets: [3, 20, 80, 300, 1000], coins: [40, 200, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'freeze_uses', title: 'Era do Gelo', description: 'Congele fantasmas com o Relógio Mágico', icon: '❄️', category: 'powerups', unit: 'congelamentos', targets: [3, 20, 80, 300, 1000], coins: [40, 200, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'bomb_blasts', title: 'Detonador em Área', description: 'Atordoe fantasmas com Bombas Flashbang', icon: '💣', category: 'powerups', unit: 'detonações', targets: [3, 20, 80, 300, 1000], coins: [40, 200, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'magnet_pulled_dots', title: 'Vórtice Dourado', description: 'Atraia pastilhas usando o Super Ímã', icon: '🧲', category: 'powerups', unit: 'pastilhas sugadas', targets: [100, 1000, 5000, 25000, 100000], coins: [40, 200, 800, 3500, 18000], xp: [100, 250, 800, 2500, 8000] },
+  { id: 'teleport_escapes', title: 'Mestre do Espaço-Tempo', description: 'Teleporte com [Espaço] para escapar de cercos', icon: '🌀', category: 'powerups', unit: 'teleportes', targets: [5, 25, 100, 500, 2000], coins: [50, 250, 1000, 4500, 22000], xp: [100, 300, 1000, 3500, 10000] },
+  { id: 'coop_shared_score', title: 'Dupla Dinâmica', description: 'Pontos acumulados no Modo 2P Co-op', icon: '👥', category: 'modos', unit: 'pontos co-op', targets: [20000, 100000, 500000, 2000000, 10000000], coins: [60, 300, 1200, 5000, 25000], xp: [150, 350, 1200, 4000, 15000] },
+  { id: 'versus_wins_pac', title: 'Vitória Amarela', description: 'Vença como Pac-Man no Modo Versus 2P', icon: '⚔️', category: 'modos', unit: 'vitórias', targets: [1, 5, 20, 80, 300], coins: [50, 250, 1000, 4500, 22000], xp: [100, 300, 1000, 3500, 10000] },
+  { id: 'versus_wins_ghost', title: 'Triunfo Carmesim', description: 'Vença como Blinky no Modo Versus 2P', icon: '👹', category: 'modos', unit: 'vitórias', targets: [1, 5, 20, 80, 300], coins: [50, 250, 1000, 4500, 22000], xp: [100, 300, 1000, 3500, 10000] },
+  { id: 'editor_maps_created', title: 'Arquiteto de Mapas', description: 'Crie e salve labirintos personalizados no Editor', icon: '🎨', category: 'modos', unit: 'mapas criados', targets: [1, 3, 7, 15, 30], coins: [100, 400, 1500, 5000, 25000], xp: [200, 500, 1500, 5000, 15000] },
+  { id: 'procedural_runs_cleared', title: 'Explorador do Infinito', description: 'Conclua labirintos gerados proceduralmente', icon: '🎲', category: 'modos', unit: 'mapas procedurais', targets: [1, 5, 25, 100, 500], coins: [60, 300, 1200, 5000, 25000], xp: [150, 350, 1200, 4000, 15000] },
+];
 
 export class AchievementManager {
   private sound: SoundSynthesizer | null = null;
   private onUnlockCallbacks: ((ach: ProgressiveAchievement, tier: AchievementTier) => void)[] = [];
   private onCoinsRewardedCallbacks: ((amount: number) => void)[] = [];
+  private onXpRewardedCallbacks: ((amount: number) => void)[] = [];
 
   private achievements: Record<string, ProgressiveAchievement> = {};
 
@@ -45,755 +123,55 @@ export class AchievementManager {
     this.onCoinsRewardedCallbacks.push(cb);
   }
 
+  public onXpRewarded(cb: (amount: number) => void) {
+    this.onXpRewardedCallbacks.push(cb);
+  }
+
   private initAchievements() {
-    this.achievements = {
-      // =========================================================================
-      // GRUPO 1: PASTILHAS & LABIRINTO (1-10)
-      // =========================================================================
-      dots_eaten: {
-        id: 'dots_eaten',
-        title: 'Comilão de Pastilhas',
-        description: 'Devore pastilhas amarelas pelo labirinto',
-        icon: '🟡',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'pastilhas',
-        tiers: [
-          { tier: 1, target: 100, name: 'Bronze ⭐', rewardCoins: 30, unlocked: false },
-          { tier: 2, target: 1000, name: 'Prata ⭐⭐', rewardCoins: 100, unlocked: false },
-          { tier: 3, target: 5000, name: 'Ouro ⭐⭐⭐', rewardCoins: 300, unlocked: false },
-        ],
-      },
-      energizers_eaten: {
-        id: 'energizers_eaten',
-        title: 'Pílula do Poder',
-        description: 'Consuma pílulas Energizer para assustar fantasmas',
-        icon: '⚪',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'energizers',
-        tiers: [
-          { tier: 1, target: 10, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 50, name: 'Prata ⭐⭐', rewardCoins: 120, unlocked: false },
-          { tier: 3, target: 200, name: 'Ouro ⭐⭐⭐', rewardCoins: 350, unlocked: false },
-        ],
-      },
-      level_clears: {
-        id: 'level_clears',
-        title: 'Desbravador de Fases',
-        description: 'Conclua fases completas no jogo',
-        icon: '🚩',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'fases',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 10, name: 'Prata ⭐⭐', rewardCoins: 200, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      single_run_dots: {
-        id: 'single_run_dots',
-        title: 'Limpeza Impecável',
-        description: 'Coma pastilhas acumuladas numa única partida',
-        icon: '🧹',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'pastilhas',
-        tiers: [
-          { tier: 1, target: 244, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 1000, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 2500, name: 'Ouro ⭐⭐⭐', rewardCoins: 400, unlocked: false },
-        ],
-      },
-      waka_master: {
-        id: 'waka_master',
-        title: 'Ritmo Waka-Waka',
-        description: 'Emita sons de mastigada waka-waka',
-        icon: '🗣️',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'mordidas',
-        tiers: [
-          { tier: 1, target: 500, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 2500, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 10000, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      speed_clear: {
-        id: 'speed_clear',
-        title: 'Limpeza Relâmpago',
-        description: 'Conclua fases em ritmo super acelerado',
-        icon: '⏱️',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'fases rápidas',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze (<60s) ⭐', rewardCoins: 60, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata (<45s) ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 15, name: 'Ouro (<30s) ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      no_energizer_clear: {
-        id: 'no_energizer_clear',
-        title: 'Desafio Puro',
-        description: 'Conclua fases sem comer nenhum Energizer',
-        icon: '🥋',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'fases puras',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 80, unlocked: false },
-          { tier: 2, target: 3, name: 'Prata ⭐⭐', rewardCoins: 250, unlocked: false },
-          { tier: 3, target: 10, name: 'Ouro ⭐⭐⭐', rewardCoins: 700, unlocked: false },
-        ],
-      },
-      corners_taken: {
-        id: 'corners_taken',
-        title: 'Mestre das Curvas (Cornering)',
-        description: 'Execute curvas perfeitas nas esquinas',
-        icon: '🔄',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'curvas',
-        tiers: [
-          { tier: 1, target: 50, name: 'Bronze ⭐', rewardCoins: 30, unlocked: false },
-          { tier: 2, target: 250, name: 'Prata ⭐⭐', rewardCoins: 100, unlocked: false },
-          { tier: 3, target: 1000, name: 'Ouro ⭐⭐⭐', rewardCoins: 300, unlocked: false },
-        ],
-      },
-      tunnel_warps: {
-        id: 'tunnel_warps',
-        title: 'Viajante dos Túneis',
-        description: 'Atravesse os túneis laterais de teletransporte',
-        icon: '🌀',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'travessias',
-        tiers: [
-          { tier: 1, target: 10, name: 'Bronze ⭐', rewardCoins: 30, unlocked: false },
-          { tier: 2, target: 50, name: 'Prata ⭐⭐', rewardCoins: 100, unlocked: false },
-          { tier: 3, target: 200, name: 'Ouro ⭐⭐⭐', rewardCoins: 300, unlocked: false },
-        ],
-      },
-      flawless_board: {
-        id: 'flawless_board',
-        title: 'Varredura Perfeita',
-        description: 'Limpe labirintos sem colidir com paredes',
-        icon: '✨',
-        category: 'pastilhas',
-        currentValue: 0,
-        unit: 'fases perfeitas',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 100, unlocked: false },
-          { tier: 2, target: 3, name: 'Prata ⭐⭐', rewardCoins: 300, unlocked: false },
-          { tier: 3, target: 10, name: 'Ouro ⭐⭐⭐', rewardCoins: 800, unlocked: false },
-        ],
-      },
+    this.achievements = {};
+    RAW_ACHIEVEMENTS.forEach((raw) => {
+      const tiers: AchievementTier[] = raw.targets.map((target, idx) => ({
+        tier: (idx + 1) as 1 | 2 | 3 | 4 | 5,
+        target,
+        name: TIER_NAMES[idx],
+        rewardCoins: raw.coins[idx],
+        rewardXp: raw.xp[idx],
+        unlocked: false,
+      }));
 
-      // =========================================================================
-      // GRUPO 2: CAÇA AOS FANTASMAS (11-20)
-      // =========================================================================
-      ghosts_eaten_total: {
-        id: 'ghosts_eaten_total',
-        title: 'Devorador de Espectros',
-        description: 'Devore fantasmas azuis assustados',
-        icon: '👻',
-        category: 'fantasmas',
+      this.achievements[raw.id] = {
+        id: raw.id,
+        title: raw.title,
+        description: raw.description,
+        icon: raw.icon,
+        category: raw.category,
         currentValue: 0,
-        unit: 'fantasmas',
-        tiers: [
-          { tier: 1, target: 10, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 50, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 250, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      quad_combos: {
-        id: 'quad_combos',
-        title: 'Caçador Supremo (4-Combo)',
-        description: 'Coma os 4 fantasmas numa única pílula de poder',
-        icon: '⚡',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'combos 4x',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 100, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 300, unlocked: false },
-          { tier: 3, target: 20, name: 'Ouro ⭐⭐⭐', rewardCoins: 800, unlocked: false },
-        ],
-      },
-      blinky_slayer: {
-        id: 'blinky_slayer',
-        title: 'Pesadelo do Blinky',
-        description: 'Devore o fantasma vermelho Blinky',
-        icon: '🔴',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'Blinkys',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 25, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 100, name: 'Ouro ⭐⭐⭐', rewardCoins: 450, unlocked: false },
-        ],
-      },
-      pinky_slayer: {
-        id: 'pinky_slayer',
-        title: 'Emboscada Invertida',
-        description: 'Devore a fantasma rosa Pinky',
-        icon: '🌸',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'Pinkys',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 25, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 100, name: 'Ouro ⭐⭐⭐', rewardCoins: 450, unlocked: false },
-        ],
-      },
-      inky_slayer: {
-        id: 'inky_slayer',
-        title: 'Quebra de Pinça',
-        description: 'Devore o fantasma ciano Inky',
-        icon: '🔷',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'Inkys',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 25, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 100, name: 'Ouro ⭐⭐⭐', rewardCoins: 450, unlocked: false },
-        ],
-      },
-      clyde_slayer: {
-        id: 'clyde_slayer',
-        title: 'Sem Covardia',
-        description: 'Devore o fantasma laranja Clyde',
-        icon: '🍊',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'Clydes',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 25, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 100, name: 'Ouro ⭐⭐⭐', rewardCoins: 450, unlocked: false },
-        ],
-      },
-      elroy_hunter: {
-        id: 'elroy_hunter',
-        title: 'Domador de Cruise Elroy',
-        description: 'Coma o Blinky enquanto ele está acelerado em modo Elroy',
-        icon: '🔥',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'Elroys',
-        tiers: [
-          { tier: 1, target: 2, name: 'Bronze ⭐', rewardCoins: 60, unlocked: false },
-          { tier: 2, target: 10, name: 'Prata ⭐⭐', rewardCoins: 200, unlocked: false },
-          { tier: 3, target: 30, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      chain_ghost_eater: {
-        id: 'chain_ghost_eater',
-        title: 'Frenesi em Cadeia',
-        description: 'Devore múltiplos fantasmas num intervalo de 3 segundos',
-        icon: '⛓️',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'sequências',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 15, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      close_call_dodge: {
-        id: 'close_call_dodge',
-        title: 'Por um Triz',
-        description: 'Passe raspando a menos de 1 tile de um fantasma perigoso',
-        icon: '😱',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'desvios',
-        tiers: [
-          { tier: 1, target: 10, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 50, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 200, name: 'Ouro ⭐⭐⭐', rewardCoins: 450, unlocked: false },
-        ],
-      },
-      ghost_eyes_eaten: {
-        id: 'ghost_eyes_eaten',
-        title: 'Vigilância Máxima',
-        description: 'Veja os olhos dos fantasmas retornarem à casinha',
-        icon: '👀',
-        category: 'fantasmas',
-        currentValue: 0,
-        unit: 'retornos',
-        tiers: [
-          { tier: 1, target: 10, name: 'Bronze ⭐', rewardCoins: 30, unlocked: false },
-          { tier: 2, target: 50, name: 'Prata ⭐⭐', rewardCoins: 100, unlocked: false },
-          { tier: 3, target: 200, name: 'Ouro ⭐⭐⭐', rewardCoins: 300, unlocked: false },
-        ],
-      },
-
-      // =========================================================================
-      // GRUPO 3: FRUTAS & ITENS BÔNUS (21-25)
-      // =========================================================================
-      fruits_eaten_total: {
-        id: 'fruits_eaten_total',
-        title: 'Banquete Frutífero',
-        description: 'Coma frutas e itens bônus que surgem no centro',
-        icon: '🍒',
-        category: 'frutas',
-        currentValue: 0,
-        unit: 'frutas',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 25, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 100, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      cherry_lover: {
-        id: 'cherry_lover',
-        title: 'Sabor Cereja',
-        description: 'Coma cerejas clássicas de 100 pontos',
-        icon: '🍒',
-        category: 'frutas',
-        currentValue: 0,
-        unit: 'cerejas',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 30, unlocked: false },
-          { tier: 2, target: 15, name: 'Prata ⭐⭐', rewardCoins: 100, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 300, unlocked: false },
-        ],
-      },
-      strawberry_lover: {
-        id: 'strawberry_lover',
-        title: 'Doce Morango',
-        description: 'Coma morangos suculentos de 300 pontos',
-        icon: '🍓',
-        category: 'frutas',
-        currentValue: 0,
-        unit: 'morangos',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 15, name: 'Prata ⭐⭐', rewardCoins: 120, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 350, unlocked: false },
-        ],
-      },
-      orange_lover: {
-        id: 'orange_lover',
-        title: 'Vitamina C',
-        description: 'Coma laranjas tropicais de 500 pontos',
-        icon: '🍊',
-        category: 'frutas',
-        currentValue: 0,
-        unit: 'laranjas',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 15, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 400, unlocked: false },
-        ],
-      },
-      key_master: {
-        id: 'key_master',
-        title: 'Chave Mestra',
-        description: 'Coma a Chave Bônus de 5.000 pontos em níveis avançados',
-        icon: '🗝️',
-        category: 'frutas',
-        currentValue: 0,
-        unit: 'chaves',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 150, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 400, unlocked: false },
-          { tier: 3, target: 15, name: 'Ouro ⭐⭐⭐', rewardCoins: 1000, unlocked: false },
-        ],
-      },
-
-      // =========================================================================
-      // GRUPO 4: SOBREVIVÊNCIA & VIDAS (26-30)
-      // =========================================================================
-      untouchable_streak: {
-        id: 'untouchable_streak',
-        title: 'Intocável',
-        description: 'Passe de fase consecutivas sem perder nenhuma vida',
-        icon: '🛡️',
-        category: 'sobrevivencia',
-        currentValue: 0,
-        unit: 'fases sem morrer',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 200, unlocked: false },
-          { tier: 3, target: 15, name: 'Ouro ⭐⭐⭐', rewardCoins: 700, unlocked: false },
-        ],
-      },
-      extra_lives_earned: {
-        id: 'extra_lives_earned',
-        title: 'Vida Extra',
-        description: 'Conquiste vidas adicionais por atingir recordes de pontuação',
-        icon: '❤️',
-        category: 'sobrevivencia',
-        currentValue: 0,
-        unit: 'vidas extras',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 20, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      last_life_clutch: {
-        id: 'last_life_clutch',
-        title: 'Sobrevivente Nato',
-        description: 'Conclua a fase com apenas 1 vida restante no limite',
-        icon: '🩸',
-        category: 'sobrevivencia',
-        currentValue: 0,
-        unit: 'clutches',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 60, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 200, unlocked: false },
-          { tier: 3, target: 15, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      tunnel_escapes: {
-        id: 'tunnel_escapes',
-        title: 'Fuga Cinematográfica',
-        description: 'Escape por um túnel lateral com um fantasma na sua cola',
-        icon: '🏃',
-        category: 'sobrevivencia',
-        currentValue: 0,
-        unit: 'fugas',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 15, name: 'Prata ⭐⭐', rewardCoins: 140, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 450, unlocked: false },
-        ],
-      },
-      time_survived: {
-        id: 'time_survived',
-        title: 'Resistência de Ferro',
-        description: 'Sobreviva tempo acumulado em jogo ativo',
-        icon: '⏳',
-        category: 'sobrevivencia',
-        currentValue: 0,
-        unit: 'minutos',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 20, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 60, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-
-      // =========================================================================
-      // GRUPO 5: PONTUAÇÃO & RECORDES (31-35)
-      // =========================================================================
-      high_score_tier: {
-        id: 'high_score_tier',
-        title: 'Pontuador de Elite',
-        description: 'Atinja pontuações expressivas em partidas individuais',
-        icon: '🏅',
-        category: 'pontos',
-        currentValue: 0,
-        unit: 'pontos máx',
-        tiers: [
-          { tier: 1, target: 10000, name: 'Bronze (10k) ⭐', rewardCoins: 60, unlocked: false },
-          { tier: 2, target: 50000, name: 'Prata (50k) ⭐⭐', rewardCoins: 250, unlocked: false },
-          { tier: 3, target: 150000, name: 'Ouro (150k) ⭐⭐⭐', rewardCoins: 800, unlocked: false },
-        ],
-      },
-      ghost_combos_1600: {
-        id: 'ghost_combos_1600',
-        title: 'Combo de Ouro 1.600 PTS',
-        description: 'Atinja a pontuação máxima de 1.600 num 4º fantasma consecutivo',
-        icon: '💎',
-        category: 'pontos',
-        currentValue: 0,
-        unit: '1.600 PTS',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 80, unlocked: false },
-          { tier: 2, target: 10, name: 'Prata ⭐⭐', rewardCoins: 300, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 900, unlocked: false },
-        ],
-      },
-      leaderboard_rank: {
-        id: 'leaderboard_rank',
-        title: 'Lenda do Ranking Arcade',
-        description: 'Conquiste posições no Top 10 de recordes do jogo',
-        icon: '🥇',
-        category: 'pontos',
-        currentValue: 0,
-        unit: 'ranking top',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze (Top 5) ⭐', rewardCoins: 80, unlocked: false },
-          { tier: 2, target: 3, name: 'Prata (Top 3) ⭐⭐', rewardCoins: 250, unlocked: false },
-          { tier: 3, target: 10, name: 'Ouro (Rank #1) ⭐⭐⭐', rewardCoins: 800, unlocked: false },
-        ],
-      },
-      total_points_accumulated: {
-        id: 'total_points_accumulated',
-        title: 'Acumulador de Pontos',
-        description: 'Some pontuações ao longo de todas as suas partidas',
-        icon: '📊',
-        category: 'pontos',
-        currentValue: 0,
-        unit: 'pontos totais',
-        tiers: [
-          { tier: 1, target: 50000, name: 'Bronze (50k) ⭐', rewardCoins: 60, unlocked: false },
-          { tier: 2, target: 250000, name: 'Prata (250k) ⭐⭐', rewardCoins: 200, unlocked: false },
-          { tier: 3, target: 1000000, name: 'Ouro (1M) ⭐⭐⭐', rewardCoins: 700, unlocked: false },
-        ],
-      },
-      level_progression: {
-        id: 'level_progression',
-        title: 'Mestre dos Níveis',
-        description: 'Avance para níveis elevados na mesma partida',
-        icon: '👑',
-        category: 'pontos',
-        currentValue: 0,
-        unit: 'nível máx',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze (Nv 5) ⭐', rewardCoins: 70, unlocked: false },
-          { tier: 2, target: 10, name: 'Prata (Nv 10) ⭐⭐', rewardCoins: 250, unlocked: false },
-          { tier: 3, target: 20, name: 'Ouro (Nv 20) ⭐⭐⭐', rewardCoins: 800, unlocked: false },
-        ],
-      },
-
-      // =========================================================================
-      // GRUPO 6: ECONOMIA & LOJINHA (36-40)
-      // =========================================================================
-      coins_earned_total: {
-        id: 'coins_earned_total',
-        title: 'Magnata do Arcade',
-        description: 'Acumule moedas coletando itens e vencendo fases',
-        icon: '🪙',
-        category: 'economia',
-        currentValue: 0,
-        unit: 'moedas',
-        tiers: [
-          { tier: 1, target: 500, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 2500, name: 'Prata ⭐⭐', rewardCoins: 200, unlocked: false },
-          { tier: 3, target: 10000, name: 'Ouro ⭐⭐⭐', rewardCoins: 800, unlocked: false },
-        ],
-      },
-      coins_spent_total: {
-        id: 'coins_spent_total',
-        title: 'Consumidor VIP',
-        description: 'Gaste moedas na Lojinha de Upgrades e Skins',
-        icon: '🛍️',
-        category: 'economia',
-        currentValue: 0,
-        unit: 'moedas gastas',
-        tiers: [
-          { tier: 1, target: 300, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 1500, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 5000, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      upgrades_purchased: {
-        id: 'upgrades_purchased',
-        title: 'Arsenal Turbinado',
-        description: 'Compre melhorias permanentes na Lojinha',
-        icon: '🔧',
-        category: 'economia',
-        currentValue: 0,
-        unit: 'upgrades',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 2, name: 'Prata ⭐⭐', rewardCoins: 120, unlocked: false },
-          { tier: 3, target: 4, name: 'Ouro ⭐⭐⭐', rewardCoins: 400, unlocked: false },
-        ],
-      },
-      skins_unlocked_total: {
-        id: 'skins_unlocked_total',
-        title: 'Guarda-Roupa Fashion',
-        description: 'Desbloqueie skins exclusivas na Lojinha',
-        icon: '🕶️',
-        category: 'economia',
-        currentValue: 0,
-        unit: 'skins',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 60, unlocked: false },
-          { tier: 2, target: 2, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 3, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      piggy_bank_saved: {
-        id: 'piggy_bank_saved',
-        title: 'Cofre Blindado',
-        description: 'Mantenha saldo simultâneo de moedas na carteira',
-        icon: '🏦',
-        category: 'economia',
-        currentValue: 0,
-        unit: 'moedas no saldo',
-        tiers: [
-          { tier: 1, target: 1000, name: 'Bronze ⭐', rewardCoins: 80, unlocked: false },
-          { tier: 2, target: 3000, name: 'Prata ⭐⭐', rewardCoins: 250, unlocked: false },
-          { tier: 3, target: 7000, name: 'Ouro ⭐⭐⭐', rewardCoins: 800, unlocked: false },
-        ],
-      },
-
-      // =========================================================================
-      // GRUPO 7: POWER-UPS ESPECIAIS (41-45)
-      // =========================================================================
-      bomb_stuns: {
-        id: 'bomb_stuns',
-        title: 'Mestre dos Explosivos',
-        description: 'Atordoe fantasmas com o choque da Bomba Flashbang',
-        icon: '💣',
-        category: 'powerups',
-        currentValue: 0,
-        unit: 'atordoamentos',
-        tiers: [
-          { tier: 1, target: 10, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 50, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 200, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      magnet_pulls: {
-        id: 'magnet_pulls',
-        title: 'Atração Magnética',
-        description: 'Puxe pastilhas à distância usando o Ímã Especial',
-        icon: '🧲',
-        category: 'powerups',
-        currentValue: 0,
-        unit: 'pastilhas atraídas',
-        tiers: [
-          { tier: 1, target: 50, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 300, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 1500, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      shield_deflections: {
-        id: 'shield_deflections',
-        title: 'Guarda Inabalável',
-        description: 'Absorva colisões mortais usando o Escudo de Energia',
-        icon: '🛡️',
-        category: 'powerups',
-        currentValue: 0,
-        unit: 'defesas',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 15, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 50, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      freeze_kills: {
-        id: 'freeze_kills',
-        title: 'Era do Gelo',
-        description: 'Devore fantasmas paralisados pelo Relógio de Congelamento',
-        icon: '🧊',
-        category: 'powerups',
-        currentValue: 0,
-        unit: 'fantasmas gelados',
-        tiers: [
-          { tier: 1, target: 5, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 25, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 100, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-      powerups_collected_total: {
-        id: 'powerups_collected_total',
-        title: 'Colecionador de Poder',
-        description: 'Colete power-ups especiais flutuantes pelo mapa',
-        icon: '⭐',
-        category: 'powerups',
-        currentValue: 0,
-        unit: 'power-ups',
-        tiers: [
-          { tier: 1, target: 10, name: 'Bronze ⭐', rewardCoins: 40, unlocked: false },
-          { tier: 2, target: 50, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 200, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-
-      // =========================================================================
-      // GRUPO 8: MODOS DE JOGO & LABIRINTOS (46-50)
-      // =========================================================================
-      ghost_hunter_wins: {
-        id: 'ghost_hunter_wins',
-        title: 'Caçador de Pac-Mans',
-        description: 'Capture o Pac-Man IA no Modo Invertido (Ghost Hunter)',
-        icon: '⚔️',
-        category: 'modos',
-        currentValue: 0,
-        unit: 'capturas',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 20, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      coop_levels_cleared: {
-        id: 'coop_levels_cleared',
-        title: 'Dupla Imbatível',
-        description: 'Conclua fases no Modo 2 Jogadores Co-op (Pac & Ms. Pac)',
-        icon: '👥',
-        category: 'modos',
-        currentValue: 0,
-        unit: 'fases co-op',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 15, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      versus_victories: {
-        id: 'versus_victories',
-        title: 'Duelo de Titãs',
-        description: 'Vença partidas no Modo 2 Jogadores Versus',
-        icon: '🤺',
-        category: 'modos',
-        currentValue: 0,
-        unit: 'vitórias versus',
-        tiers: [
-          { tier: 1, target: 1, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 180, unlocked: false },
-          { tier: 3, target: 15, name: 'Ouro ⭐⭐⭐', rewardCoins: 600, unlocked: false },
-        ],
-      },
-      turbo_stages_survived: {
-        id: 'turbo_stages_survived',
-        title: 'Maníaco do Turbo',
-        description: 'Sobreviva e passe fases no veloz Modo Turbo 2x',
-        icon: '⚡',
-        category: 'modos',
-        currentValue: 0,
-        unit: 'fases turbo',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 60, unlocked: false },
-          { tier: 2, target: 7, name: 'Prata ⭐⭐', rewardCoins: 200, unlocked: false },
-          { tier: 3, target: 15, name: 'Ouro ⭐⭐⭐', rewardCoins: 700, unlocked: false },
-        ],
-      },
-      mazes_explored_count: {
-        id: 'mazes_explored_count',
-        title: 'Viajante de Labirintos',
-        description: 'Jogue em labirintos diferentes (Ms. Pac, Google, Tipografia)',
-        icon: '🗺️',
-        category: 'modos',
-        currentValue: 0,
-        unit: 'mapas jogados',
-        tiers: [
-          { tier: 1, target: 3, name: 'Bronze ⭐', rewardCoins: 50, unlocked: false },
-          { tier: 2, target: 5, name: 'Prata ⭐⭐', rewardCoins: 150, unlocked: false },
-          { tier: 3, target: 7, name: 'Ouro ⭐⭐⭐', rewardCoins: 500, unlocked: false },
-        ],
-      },
-    };
+        unit: raw.unit,
+        tiers,
+      };
+    });
   }
 
   public getAchievements(): ProgressiveAchievement[] {
     return Object.values(this.achievements);
   }
 
-  public getTotalStars(): { unlocked: number; total: number } {
-    let unlocked = 0;
-    const all = Object.values(this.achievements);
-    all.forEach((ach) => {
-      ach.tiers.forEach((t) => {
-        if (t.unlocked) unlocked++;
+  public getByCategory(category: ProgressiveAchievement['category']): ProgressiveAchievement[] {
+    return Object.values(this.achievements).filter((a) => a.category === category);
+  }
+
+  public getUnlockedTiersCount(): number {
+    let count = 0;
+    Object.values(this.achievements).forEach((a) => {
+      a.tiers.forEach((t) => {
+        if (t.unlocked) count++;
       });
     });
-    return { unlocked, total: all.length * 3 };
+    return count;
+  }
+
+  public getTotalTiersCount(): number {
+    return Object.values(this.achievements).length * 5; // 50 trilhas * 5 tiers = 250 níveis!
   }
 
   public increment(id: string, amount: number = 1) {
@@ -830,6 +208,7 @@ export class AchievementManager {
         this.sound?.playExtraLife();
         this.onUnlockCallbacks.forEach((cb) => cb(ach, t));
         this.onCoinsRewardedCallbacks.forEach((cb) => cb(t.rewardCoins));
+        this.onXpRewardedCallbacks.forEach((cb) => cb(t.rewardXp));
       }
     });
 
@@ -846,7 +225,7 @@ export class AchievementManager {
       <div class="achievement-text">
         <div class="achievement-header">🏆 CONQUISTA DESBLOQUEADA!</div>
         <div class="achievement-name">${ach.title} (${tier.name})</div>
-        <div class="achievement-desc">+${tier.rewardCoins} 🪙 Moedas Recebidas!</div>
+        <div class="achievement-desc">+${tier.rewardCoins} 🪙 Moedas & +${tier.rewardXp} ⭐ XP!</div>
       </div>
     `;
     document.body.appendChild(toast);
@@ -870,13 +249,13 @@ export class AchievementManager {
           tiers: ach.tiers.map((t) => t.unlocked),
         };
       });
-      SaveService.setItem('pacman_progressive_achievements_v2', JSON.stringify(state));
+      SaveService.setItem('pacman_progressive_achievements_v3', JSON.stringify(state));
     } catch {}
   }
 
   private loadFromStorage() {
     try {
-      const saved = SaveService.getItem('pacman_progressive_achievements_v2');
+      const saved = SaveService.getItem('pacman_progressive_achievements_v3');
       if (saved) {
         const state = JSON.parse(saved);
         Object.entries(state).forEach(([id, data]: [string, any]) => {

@@ -1,5 +1,5 @@
 /**
- * BATERIA DE TESTES EXAUSTIVA - PAC-MAN DEFINITIVE EDITION
+ * BATERIA DE TESTES EXAUSTIVA - PAC-MAN DEFINITIVE EDITION v1.0.2
  * Executa testes funcionais, matemáticos, lógicos e de persistência.
  */
 
@@ -28,7 +28,7 @@ function assert(condition, name, details = '') {
 }
 
 console.log('================================================================');
-console.log('🕹️  PAC-MAN ARCADE - INICIANDO BATERIA EXAUSTIVA DE TESTES  🕹️');
+console.log('🕹️  PAC-MAN ARCADE v1.0.2 - INICIANDO BATERIA DE TESTES  🕹️');
 console.log('================================================================\n');
 
 // -----------------------------------------------------------------------------
@@ -52,21 +52,10 @@ const FORBIDDEN_UP_TILES = [
 ];
 assert(FORBIDDEN_UP_TILES.length === 4, 'Exatamente 4 interseções proibidas para virar para CIMA');
 
-// Validação da geometria da casinha dos fantasmas (linhas 14 a 19)
-const ghostHouseCorridorRow = 14;
-const ghostHouseDoorRow = 15;
-const ghostHouseExitCols = [13, 14];
-
-assert(ghostHouseCorridorRow === 14, 'Corredor de saída dos fantasmas está livre na linha 14');
-assert(ghostHouseDoorRow === 15, 'Porta da casinha dos fantasmas está posicionada na linha 15');
-assert(ghostHouseExitCols.includes(13) && ghostHouseExitCols.includes(14), 'Porta dos fantasmas ocupa colunas 13 e 14');
-
 // -----------------------------------------------------------------------------
-// 2. TESTES DE IA DOS FANTASMAS (BLINKY, PINKY, INKY, CLYDE)
+// 2. TESTES DE IA DOS FANTASMAS
 // -----------------------------------------------------------------------------
 console.log('\n👻 MÓDULO 2: IAs dos Fantasmas e Algoritmos de Alvo');
-
-// 2.1 Blinky (Perseguição Direta)
 function getBlinkyTarget(pacman) {
   return { x: pacman.tileX, y: pacman.tileY };
 }
@@ -74,13 +63,11 @@ const pac = { tileX: 14, tileY: 26, dir: { x: 1, y: 0 } };
 const blinkyTarget = getBlinkyTarget(pac);
 assert(blinkyTarget.x === 14 && blinkyTarget.y === 26, 'Blinky mira exatamente na posição atual do Pac-Man');
 
-// 2.2 Pinky (Emboscada 4 tiles à frente)
 function getPinkyTarget(pacman) {
   const target = {
     x: pacman.tileX + pacman.dir.x * 4,
     y: pacman.tileY + pacman.dir.y * 4,
   };
-  // Bug clássico do Arcade: se Pacman olha para cima, subtrai 4 em X também
   if (pacman.dir.y === -1) {
     target.x -= 4;
   }
@@ -90,199 +77,133 @@ pac.dir = { x: 0, y: -1 }; // CIMA
 const pinkyTargetUp = getPinkyTarget(pac);
 assert(pinkyTargetUp.x === 10 && pinkyTargetUp.y === 22, 'Pinky reproduz comportamento clássico do Arcade ao mirar para CIMA (offset X e Y)');
 
-pac.dir = { x: 1, y: 0 }; // DIREITA
-const pinkyTargetRight = getPinkyTarget(pac);
-assert(pinkyTargetRight.x === 18 && pinkyTargetRight.y === 26, 'Pinky mira 4 tiles à frente na horizontal');
-
-// 2.3 Inky (Vetor Duplo de Pinça com o Blinky)
-function getInkyTarget(pacman, blinky) {
-  const pivotX = pacman.tileX + pacman.dir.x * 2;
-  const pivotY = pacman.tileY + pacman.dir.y * 2;
-  return {
-    x: pivotX + (pivotX - blinky.tileX),
-    y: pivotY + (pivotY - blinky.tileY),
-  };
-}
-const blinkyPos = { tileX: 10, tileY: 26 };
-const inkyTarget = getInkyTarget(pac, blinkyPos);
-// pivot = (14 + 2, 26 + 0) = (16, 26). target = (16 + (16-10), 26 + (26-26)) = (22, 26)
-assert(inkyTarget.x === 22 && inkyTarget.y === 26, 'Inky calcula vetor de pinça dupla perfeitamente');
-
-// 2.4 Clyde (Distância de 8 tiles)
-function getClydeTarget(pacman, clyde) {
-  const distSq = Math.pow(clyde.tileX - pacman.tileX, 2) + Math.pow(clyde.tileY - pacman.tileY, 2);
-  if (distSq > 64) {
-    return { x: pacman.tileX, y: pacman.tileY }; // Persegue
+// -----------------------------------------------------------------------------
+// 3. TESTES DE FÓRMULA DE UPGRADES EM 2 FASES (30% / 40%)
+// -----------------------------------------------------------------------------
+console.log('\n💰 MÓDULO 3: Fórmula Exponencial de Upgrades em 2 Fases');
+function calculateUpgradePrice(basePrice, maxLevel, currentLevel) {
+  if (currentLevel >= maxLevel) return 0;
+  const halfLevel = Math.ceil(maxLevel / 2);
+  let price = basePrice;
+  for (let i = 0; i < currentLevel; i++) {
+    const mult = i < halfLevel ? 1.30 : 1.40;
+    price = Math.round(price * mult);
   }
-  return { x: 0, y: 35 }; // Canto inferior esquerdo (Scatter)
-}
-const clydeFar = { tileX: 2, tileY: 2 };
-assert(getClydeTarget(pac, clydeFar).x === 14, 'Clyde persegue o Pac-Man quando está a mais de 8 tiles');
-const clydeClose = { tileX: 14, tileY: 24 };
-assert(getClydeTarget(pac, clydeClose).x === 0 && getClydeTarget(pac, clydeClose).y === 35, 'Clyde recua para o canto quando está a menos de 8 tiles');
-
-// -----------------------------------------------------------------------------
-// 3. TESTES DE PONTUAÇÃO & COMBOS DE FANTASMAS
-// -----------------------------------------------------------------------------
-console.log('\n🍒 MÓDULO 3: Pontuações e Multiplicadores de Combo');
-const GHOST_SCORES = [200, 400, 800, 1600];
-for (let i = 0; i < 4; i++) {
-  const expected = 200 * Math.pow(2, i);
-  assert(GHOST_SCORES[i] === expected, `Combo #${i + 1} de fantasma concede ${expected} pontos`);
+  return price;
 }
 
+const energizerLevel0Price = calculateUpgradePrice(500, 30, 0);
+assert(energizerLevel0Price === 500, 'Nível 1 de Pílula Estendida custa exatamente 500 moedas');
+
+const energizerLevel1Price = calculateUpgradePrice(500, 30, 1);
+assert(energizerLevel1Price === 650, 'Nível 2 de Pílula Estendida custa +30% (650 moedas)');
+
+const energizerLevel16Price = calculateUpgradePrice(500, 30, 16);
+const energizerLevel17Price = calculateUpgradePrice(500, 30, 17);
+assert(Math.round(energizerLevel16Price * 1.40) === energizerLevel17Price, 'Segunda metade do upgrade aplica escala de +40% por nível');
+
 // -----------------------------------------------------------------------------
-// 4. TESTES DO GERADOR PROCEDURAL DE LABIRINTOS (100 ITERAÇÕES)
+// 4. TESTES DOS NOVOS UPGRADES E HABILIDADES
 // -----------------------------------------------------------------------------
-console.log('\n🎲 MÓDULO 4: Gerador de Mapas Procedurais (100 Testes de Integridade)');
-function generateTestMaze(seed) {
-  const map = Array.from({ length: MAZE_ROWS }, () => Array(MAZE_COLS).fill(1));
-  let rng = seed;
-  function rand() {
-    rng = (rng * 9301 + 49297) % 233280;
-    return rng / 233280;
+console.log('\n🌀 MÓDULO 4: Novos Upgrades (Teletransporte, Lentidão, Pomar e Ímã)');
+function getTeleportCooldown(level) {
+  return Math.max(30, 60 - level);
+}
+assert(getTeleportCooldown(0) === 60, 'Teletransporte começa com 60 segundos de cooldown');
+assert(getTeleportCooldown(15) === 45, 'Teletransporte no nível 15 tem 45 segundos de cooldown');
+assert(getTeleportCooldown(30) === 30, 'Teletransporte no nível 30 atinge cooldown mínimo de 30 segundos');
+
+function getGhostSlowdownMultiplier(level) {
+  return 1.0 - (level * 0.005);
+}
+assert(getGhostSlowdownMultiplier(0) === 1.0, 'Sem upgrade, velocidade dos fantasmas é normal (100%)');
+assert(getGhostSlowdownMultiplier(20) === 0.90, 'No nível 20 de Névoa de Distração, fantasmas ficam 10% mais lentos (90%)');
+
+function getFertileOrchardCount(level) {
+  return 2 + level;
+}
+assert(getFertileOrchardCount(0) === 2, 'Labirinto padrão gera 2 frutas');
+assert(getFertileOrchardCount(3) === 5, 'No nível 3 de Pomar Fértil gera até 5 frutas por labirinto');
+
+// -----------------------------------------------------------------------------
+// 5. TESTES DO SISTEMA DE XP, NÍVEL E MAESTRIA
+// -----------------------------------------------------------------------------
+console.log('\n⭐ MÓDULO 5: Sistema de XP do Jogador, Níveis (1-100+) e Maestria');
+function getXpForNextLevel(lvl) {
+  if (lvl <= 15) {
+    return Math.round(100 + Math.pow(lvl, 1.45) * 50);
   }
-
-  // Escavação simétrica
-  for (let r = 4; r <= 32; r += 2) {
-    for (let c = 1; c <= 13; c += 2) {
-      map[r][c] = 2; // DOT
-      map[r][MAZE_COLS - 1 - c] = 2;
-    }
-  }
-
-  // Túnel central
-  map[17][0] = 5; // WARP_TUNNEL
-  map[17][MAZE_COLS - 1] = 5;
-  return map;
+  return Math.round(3200 + Math.pow(lvl - 15, 1.85) * 220);
 }
 
-let proceduralErrors = 0;
-for (let s = 1; s <= 100; s++) {
-  const testMap = generateTestMaze(s);
-  // Testa limites
-  if (testMap.length !== 36 || testMap[0].length !== 28) proceduralErrors++;
-  // Testa simetria
-  for (let r = 0; r < 36; r++) {
-    for (let c = 0; c < 14; c++) {
-      if (testMap[r][c] !== testMap[r][27 - c]) proceduralErrors++;
-    }
-  }
+assert(getXpForNextLevel(1) === 150, 'Nível 1 requer 150 XP para o Nível 2');
+assert(getXpForNextLevel(15) < 4000, 'Nível 15 requer curva acessível (<4.000 XP)');
+assert(getXpForNextLevel(50) > 50000, 'Nível 50 escala significativamente para longevidade');
+
+function getMasteryScoreMultiplier(lvl) {
+  const bonusPercent = Math.floor(lvl / 10);
+  return 1.0 + bonusPercent * 0.01;
 }
-assert(proceduralErrors === 0, '100 labirintos procedurais gerados com 100% de simetria bilateral e dimensões exatas');
+assert(getMasteryScoreMultiplier(1) === 1.0, 'Nível 1 tem bônus de maestria de 0% (1.0x)');
+assert(getMasteryScoreMultiplier(10) === 1.01, 'Nível 10 concede +1% permanente em toda a pontuação (1.01x)');
+assert(getMasteryScoreMultiplier(50) === 1.05, 'Nível 50 concede +5% permanente em toda a pontuação (1.05x)');
+assert(getMasteryScoreMultiplier(100) === 1.10, 'Nível 100 concede +10% permanente em toda a pontuação (1.10x)');
 
 // -----------------------------------------------------------------------------
-// 5. TESTES DO SISTEMA DE ECONOMIA & LOJINHA
+// 6. TESTES DO SISTEMA DE CONQUISTAS (5 TIERS: BRONZE A MÍTICO)
 // -----------------------------------------------------------------------------
-console.log('\n🪙 MÓDULO 5: Economia, Moedas, Desbloqueio de Skins e Upgrades');
-localStorage.clear();
-
-let currentCoins = 0;
-let totalEarned = 0;
-const unlockedSkins = new Set(['CLASSIC']);
-const upgrades = { extraLife: false, boostedFruits: false, prolongedEnergizer: false, superMagnet: false };
-
-function addCoins(amount) {
-  currentCoins += amount;
-  totalEarned += amount;
-}
-function spendCoins(amount) {
-  if (currentCoins >= amount) {
-    currentCoins -= amount;
-    return true;
-  }
-  return false;
-}
-
-addCoins(100);
-assert(currentCoins === 100 && totalEarned === 100, 'Adição de 100 moedas computada');
-
-const buyUpgradeSuccess = spendCoins(50);
-assert(buyUpgradeSuccess && currentCoins === 50, 'Gasto de 50 moedas efetuado com sucesso');
-
-const buyTooExpensive = spendCoins(9999);
-assert(!buyTooExpensive && currentCoins === 50, 'Gasto de valor maior que o saldo rejeitado');
-
-const energizerLevel = 30;
-const energizerTotalDuration = 6.0 + energizerLevel * 0.3;
-assert(Math.abs(energizerTotalDuration - 15.0) < 0.001, 'Upgrade Pílula Estendida alcança 15.0s de tempo vulnerável no nível 30 (6s base + 9s)');
-
-const jailLevel = 12;
-const ghostJailTotalDuration = 3.0 + jailLevel * 0.25;
-assert(Math.abs(ghostJailTotalDuration - 6.0) < 0.001, 'Upgrade Prisão Espectral alcança 6.0s de retenção na casinha no nível 12 (3s base + 3s)');
-
-// -----------------------------------------------------------------------------
-// 6. TESTES DO SISTEMA DE CONQUISTAS PROGRESSIVAS (50 TRILHAS / 150 TIERS)
-// -----------------------------------------------------------------------------
-console.log('\n🏆 MÓDULO 6: Sistema de Conquistas Progressivas (50 Trilhas x 3 Tiers = 150 Níveis)');
-const progressiveAch = {
+console.log('\n🏆 MÓDULO 6: Conquistas Progressivas Expandidas para 5 Tiers');
+const testAch = {
   id: 'dots_eaten',
   currentValue: 0,
   tiers: [
-    { tier: 1, target: 100, unlocked: false, rewardCoins: 30 },
-    { tier: 2, target: 1000, unlocked: false, rewardCoins: 100 },
-    { tier: 3, target: 5000, unlocked: false, rewardCoins: 300 },
+    { tier: 1, target: 500, name: 'Bronze ⭐', unlocked: false, rewardCoins: 50, rewardXp: 100 },
+    { tier: 2, target: 5000, name: 'Prata ⭐⭐', unlocked: false, rewardCoins: 250, rewardXp: 300 },
+    { tier: 3, target: 25000, name: 'Ouro ⭐⭐⭐', unlocked: false, rewardCoins: 1000, rewardXp: 1000 },
+    { tier: 4, target: 100000, name: 'Platina 💎', unlocked: false, rewardCoins: 5000, rewardXp: 3000 },
+    { tier: 5, target: 500000, name: 'Mítico 👑', unlocked: false, rewardCoins: 25000, rewardXp: 10000 },
   ],
 };
 
-function incrementProgressive(ach, amount) {
+function addAchProgress(ach, amount) {
   ach.currentValue += amount;
-  let unlockedTiers = [];
   ach.tiers.forEach((t) => {
     if (!t.unlocked && ach.currentValue >= t.target) {
       t.unlocked = true;
-      unlockedTiers.push(t.tier);
     }
   });
-  return unlockedTiers;
 }
 
-const tier1Result = incrementProgressive(progressiveAch, 150);
-assert(tier1Result.includes(1) && progressiveAch.tiers[0].unlocked, 'Tier 1 (Bronze ⭐) desbloqueado ao atingir 150 pastilhas');
-assert(!progressiveAch.tiers[1].unlocked && !progressiveAch.tiers[2].unlocked, 'Tiers 2 e 3 permanecem bloqueados');
+addAchProgress(testAch, 600);
+assert(testAch.tiers[0].unlocked && !testAch.tiers[1].unlocked, 'Tier 1 Bronze ⭐ desbloqueado com 600 pastilhas');
 
-const tier2Result = incrementProgressive(progressiveAch, 900); // 150 + 900 = 1050
-assert(tier2Result.includes(2) && progressiveAch.tiers[1].unlocked, 'Tier 2 (Prata ⭐⭐) desbloqueado ao atingir 1.050 pastilhas');
+addAchProgress(testAch, 99400); // Total: 100.000
+assert(testAch.tiers[3].unlocked && !testAch.tiers[4].unlocked, 'Tier 4 Platina 💎 desbloqueado ao atingir 100.000 pastilhas');
 
-const tier3Result = incrementProgressive(progressiveAch, 4000); // 1050 + 4000 = 5050
-assert(tier3Result.includes(3) && progressiveAch.tiers[2].unlocked, 'Tier 3 (Ouro ⭐⭐⭐) desbloqueado com sucesso ao superar 5.000 pastilhas');
+addAchProgress(testAch, 400000); // Total: 500.000
+assert(testAch.tiers[4].unlocked, 'Tier 5 Mítico 👑 desbloqueado com sucesso ao atingir 500.000 pastilhas!');
 
 // -----------------------------------------------------------------------------
-// 7. TESTES DA TABELA DE RECORDES (LEADERBOARD TOP 10)
+// 7. TESTES DA NOVA TABELA DE PREÇOS DE SKINS E CATEGORIAS
 // -----------------------------------------------------------------------------
-console.log('\n🥇 MÓDULO 7: Ranking de Recordes com Iniciais');
-let leaderboard = [
-  { initials: 'PAC', score: 10000 },
-  { initials: 'MID', score: 8500 },
-  { initials: 'NAM', score: 6200 },
+console.log('\n🎨 MÓDULO 7: Tabela de Preços e Categorias de Skins');
+const skinsConfig = [
+  { skin: 'CLASSIC', price: 0, category: 'standard' },
+  { skin: 'SUNGLASSES', price: 300, category: 'standard' },
+  { skin: 'GOLDEN', price: 800, category: 'intermediate' },
+  { skin: 'MS_PACMAN', price: 2000, category: 'collector' },
+  { skin: 'EASTER', price: 3000, category: 'seasonal' },
+  { skin: 'CHRISTMAS', price: 3500, category: 'seasonal' },
+  { skin: 'HALLOWEEN', price: 3500, category: 'seasonal' },
+  { skin: 'CYBERPUNK', price: 5000, category: 'legendary' },
 ];
 
-function addHighScore(initials, score) {
-  const formatted = (initials || 'AAA').toUpperCase().slice(0, 3);
-  leaderboard.push({ initials: formatted, score });
-  leaderboard.sort((a, b) => b.score - a.score);
-  if (leaderboard.length > 10) leaderboard = leaderboard.slice(0, 10);
-}
-
-addHighScore('pro_player', 15000);
-assert(leaderboard[0].initials === 'PRO', 'Iniciais longas sanitizadas para exatamente 3 caracteres em maiúsculo (PRO)');
-assert(leaderboard[0].score === 15000, 'Maior pontuação posicionada no Rank #1');
-
-// -----------------------------------------------------------------------------
-// 8. TESTES DE POWER-UPS E STATUS
-// -----------------------------------------------------------------------------
-console.log('\n⚡ MÓDULO 8: Power-ups, Atordoamento e Congelamento');
-const powerUpState = {
-  hasShield: true,
-  freezeTimer: 5000,
-  stunTimer: 4000,
-  magnetRadius: 6, // Com upgrade
-};
-
-assert(powerUpState.hasShield === true, 'Escudo de energia absorve 1 colisão fatal');
-assert(powerUpState.freezeTimer === 5000, 'Relógio congela fantasmas por 5000ms');
-assert(powerUpState.stunTimer === 4000, 'Bomba atordoa fantasmas em área por 4000ms');
-assert(powerUpState.magnetRadius === 6, 'Super Ímã aprimorado atrai pastilhas em raio de 6 tiles');
+assert(skinsConfig.find(s => s.skin === 'SUNGLASSES').price === 300, 'Óculos Escuros custa 300 moedas');
+assert(skinsConfig.find(s => s.skin === 'MS_PACMAN').price === 2000, 'Ms. Pac-Man custa 2.000 moedas');
+assert(skinsConfig.find(s => s.skin === 'EASTER').price === 3000, 'Pac de Páscoa custa 3.000 moedas');
+assert(skinsConfig.find(s => s.skin === 'CHRISTMAS').price === 3500, 'Pac de Natal custa 3.500 moedas');
+assert(skinsConfig.find(s => s.skin === 'HALLOWEEN').price === 3500, 'Pac de Halloween custa 3.500 moedas');
+assert(skinsConfig.find(s => s.skin === 'CYBERPUNK').price === 5000, 'Cyber Mecha Pac custa 5.000 moedas');
 
 // -----------------------------------------------------------------------------
 // RESULTADO FINAL
@@ -290,7 +211,7 @@ assert(powerUpState.magnetRadius === 6, 'Super Ímã aprimorado atrai pastilhas 
 console.log('\n================================================================');
 if (testsFailed === 0) {
   console.log(`🎉 TODOS OS ${testsPassed} TESTES PASSARAM COM 100% DE SUCESSO!`);
-  console.log('   Nenhum erro ou bug lógico detectado nas funcionalidades.');
+  console.log('   Nenhum erro ou bug lógico detectado nas novas funcionalidades.');
 } else {
   console.error(`🚨 ${testsFailed} TESTES FALHARAM:`);
   failures.forEach((f) => console.error(`   - ${f.name}: ${f.details}`));

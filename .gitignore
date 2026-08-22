@@ -13,3 +13,4 @@ dist-ssr
 *.sw?
 .gemini
 release
+public/downloads

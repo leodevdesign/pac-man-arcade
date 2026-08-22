@@ -12,6 +12,7 @@ export class ShopModal {
   private economyService: EconomyService;
   private themeManager: ThemeManager;
   private currentTab: 'upgrades' | 'skins' = 'upgrades';
+  private selectedSkinCategory: string = 'all';
   private onSkinEquippedCallbacks: ((skin: PacmanSkin) => void)[] = [];
 
   constructor(economyService: EconomyService, themeManager: ThemeManager) {
@@ -73,12 +74,21 @@ export class ShopModal {
       this.render();
     });
 
+    // Wire Skin Filter Pills
+    contentBox.querySelectorAll('.skin-category-pill').forEach((pill) => {
+      pill.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        this.selectedSkinCategory = target.dataset.cat || 'all';
+        this.render();
+      });
+    });
+
     // Wire Upgrades Buttons
     contentBox.querySelectorAll('.btn-buy-upgrade, .shop-action-btn:not([disabled])').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
         const key = target.dataset.key as keyof MultiLevelUpgrades;
-        if (key && this.economyService.upgrade(key)) {
+        if (key && this.economyService.buyUpgrade(key)) {
           this.render();
           const coinsDisplay = document.getElementById('shopCoinsAmount');
           if (coinsDisplay) {
@@ -148,7 +158,7 @@ export class ShopModal {
               </div>
 
               <button 
-                class="shop-action-btn ${isMax ? 'btn-max' : canAfford ? 'btn-buy' : 'btn-disabled'}"
+                class="shop-action-btn btn-buy-upgrade ${isMax ? 'btn-max' : canAfford ? 'btn-buy' : 'btn-disabled'}"
                 data-key="${def.key}"
                 ${isMax || !canAfford ? 'disabled' : ''}
               >
@@ -165,15 +175,29 @@ export class ShopModal {
     const currentCoins = this.economyService.getCoins();
     const equippedSkin = this.themeManager.getSkin();
 
+    const filteredSkins = this.selectedSkinCategory === 'all'
+      ? SKIN_DEFINITIONS
+      : SKIN_DEFINITIONS.filter((s) => s.category === this.selectedSkinCategory);
+
     return `
+      <!-- Categorias de Skins -->
+      <div class="skin-categories-filter">
+        <button class="skin-category-pill ${this.selectedSkinCategory === 'all' ? 'active' : ''}" data-cat="all">Todas (${SKIN_DEFINITIONS.length})</button>
+        <button class="skin-category-pill ${this.selectedSkinCategory === 'standard' ? 'active' : ''}" data-cat="standard">🟡 Padrão</button>
+        <button class="skin-category-pill ${this.selectedSkinCategory === 'intermediate' ? 'active' : ''}" data-cat="intermediate">👑 Intermediário</button>
+        <button class="skin-category-pill ${this.selectedSkinCategory === 'collector' ? 'active' : ''}" data-cat="collector">🎀 Colecionador</button>
+        <button class="skin-category-pill ${this.selectedSkinCategory === 'seasonal' ? 'active' : ''}" data-cat="seasonal">🎉 Sazonais</button>
+        <button class="skin-category-pill ${this.selectedSkinCategory === 'legendary' ? 'active' : ''}" data-cat="legendary">💎 Lendário</button>
+      </div>
+
       <div class="shop-grid">
-        ${SKIN_DEFINITIONS.map((def) => {
+        ${filteredSkins.map((def) => {
           const isUnlocked = this.economyService.isSkinUnlocked(def.skin);
           const isEquipped = equippedSkin === def.skin;
           const canAfford = currentCoins >= def.price;
 
           let btnClass = 'btn-buy';
-          let btnText = `DESBLOQUEAR (${def.price} 🪙)`;
+          let btnText = `DESBLOQUEAR (${def.price.toLocaleString()} 🪙)`;
 
           if (isEquipped) {
             btnClass = 'btn-equipped';
@@ -191,7 +215,7 @@ export class ShopModal {
                 <div class="shop-card-icon" style="font-size: 1.6rem;">${def.icon}</div>
                 <div class="shop-card-title-box">
                   <div class="shop-card-title">${def.name}</div>
-                  <div class="shop-card-status">${isEquipped ? 'Em Uso' : isUnlocked ? 'Desbloqueada' : 'Bloqueada'}</div>
+                  <div class="shop-category-tag tag-${def.category}">${def.categoryLabel}</div>
                 </div>
               </div>
 

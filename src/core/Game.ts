@@ -29,6 +29,7 @@ import { MapConfig, MAP_PRESETS } from '../map/MapRegistry.ts';
 import { PacmanAI } from '../ai/PacmanAI.ts';
 import { ThemeManager, ThemeConfig } from '../ui/ThemeManager.ts';
 import { EconomyService } from '../services/EconomyService.ts';
+import { ProfileService } from '../services/ProfileService.ts';
 import { AchievementManager } from '../services/AchievementManager.ts';
 import { LeaderboardService } from '../services/LeaderboardService.ts';
 import { MatrixRainEffect } from '../ui/MatrixRainEffect.ts';
@@ -55,10 +56,12 @@ export class Game {
   public sound: SoundSynthesizer;
   public themeManager: ThemeManager;
   public economyService: EconomyService;
+  public profileService: ProfileService;
   public achievementManager: AchievementManager;
   public leaderboardService: LeaderboardService;
   private matrixRain: MatrixRainEffect;
   private attractOverlayEl: HTMLElement | null = null;
+  private teleportCooldownTimer: number = 0;
 
   public state: GameState = GameState.ATTRACT;
   public level: number = 1;
@@ -95,6 +98,7 @@ export class Game {
 
     this.themeManager = new ThemeManager();
     this.economyService = new EconomyService();
+    this.profileService = new ProfileService();
     this.achievementManager = new AchievementManager();
     this.leaderboardService = new LeaderboardService();
 
@@ -118,9 +122,13 @@ export class Game {
     this.sound = new SoundSynthesizer();
     this.matrixRain = new MatrixRainEffect();
 
+    this.profileService.setSound(this.sound);
     this.achievementManager.setSound(this.sound);
     this.achievementManager.onCoinsRewarded((coins) => {
       this.economyService.addCoins(coins);
+    });
+    this.achievementManager.onXpRewarded((xp) => {
+      this.profileService.addXp(xp);
     });
 
     this.applyTheme(this.themeManager.getTheme());
@@ -145,6 +153,55 @@ export class Game {
     this.input.setOnMute(() => {
       this.sound.toggleMute();
     });
+
+    window.addEventListener('keydown', (e) => {
+      if (
+        e.code === 'Space' &&
+        this.state === GameState.PLAYING &&
+        !this.isGamePaused &&
+        document.activeElement?.tagName !== 'INPUT'
+      ) {
+        this.tryEmergencyTeleport();
+      }
+    });
+  }
+
+  public tryEmergencyTeleport() {
+    if (this.teleportCooldownTimer > 0) return;
+
+    // Busca posições livres no mapa
+    const freeTiles: { x: number; y: number }[] = [];
+    for (let r = 4; r < 32; r++) {
+      for (let c = 1; c < 27; c++) {
+        if (this.maze.isWalkableForPacman(c, r)) {
+          freeTiles.push({ x: c, y: r });
+        }
+      }
+    }
+
+    if (freeTiles.length === 0) return;
+
+    // Procura o tile mais distante de todos os 4 fantasmas
+    let bestTile = freeTiles[0];
+    let maxMinDist = -1;
+
+    for (const tile of freeTiles) {
+      let minDistToGhost = Infinity;
+      for (const ghost of this.ghosts) {
+        const d = Math.hypot(tile.x * 8 - ghost.x, tile.y * 8 - ghost.y);
+        if (d < minDistToGhost) minDistToGhost = d;
+      }
+      if (minDistToGhost > maxMinDist) {
+        maxMinDist = minDistToGhost;
+        bestTile = tile;
+      }
+    }
+
+    this.pacman.x = bestTile.x * 8;
+    this.pacman.y = bestTile.y * 8 + 4;
+    this.teleportCooldownTimer = this.economyService.getTeleportCooldownSeconds();
+    this.sound.playEatFruit();
+    this.achievementManager.increment('teleport_escapes', 1);
   }
 
   public setTheme(themeType: ThemeType) {
@@ -293,10 +350,12 @@ export class Game {
     const baseDuration = 6000;
     this.frightenedDuration = baseDuration;
 
-    // Atualiza a retenção da Prisão Espectral em todos os fantasmas
+    // Atualiza a retenção da Prisão Espectral e lentidão em todos os fantasmas
     const jailDuration = this.economyService.getGhostJailDurationMs();
+    const ghostSlowdown = this.economyService.getGhostSlowdownMultiplier();
     this.ghosts.forEach((ghost) => {
       ghost.jailDurationMs = jailDuration;
+      ghost.speed = BASE_SPEED * 0.75 * speedMult * ghostSlowdown;
     });
   }
 
@@ -413,6 +472,7 @@ export class Game {
             this.achievementManager.increment('last_life_clutch', 1);
           }
           this.economyService.addCoins(100); // Recompensa de conclusão de nível
+          this.profileService.addXp(200); // XP por fase concluída
           this.achievementManager.increment('coins_earned_total', 100);
           this.level++;
           this.startLevel();
@@ -427,6 +487,11 @@ export class Game {
 
   private updatePlaying(dt: number) {
     const scoreMult = this.gameMode === GameMode.TURBO ? 2 : 1;
+    const masteryMult = this.profileService.getMasteryScoreMultiplier();
+
+    if (this.teleportCooldownTimer > 0) {
+      this.teleportCooldownTimer -= dt / 1000;
+    }
 
     // 1. Atualização dos Power-ups
     this.powerUpManager.update(
@@ -514,19 +579,37 @@ export class Game {
     }
 
     // 4. Checagem de Pastilhas
-    this.handlePelletEating(this.pacman, false, scoreMult);
+    this.handlePelletEating(this.pacman, false, scoreMult, masteryMult);
     if (this.gameMode === GameMode.COOP_2P) {
-      this.handlePelletEating(this.pacman2, true, scoreMult);
+      this.handlePelletEating(this.pacman2, true, scoreMult, masteryMult);
     }
 
-    // 5. Checagem de Fruta
+    // 5. Checagem de Fruta (Pomar Fértil & Ímã de Frutas)
+    this.fruitManager.checkPelletSpawns(
+      this.pelletManager.getEatenCount(),
+      this.level,
+      this.economyService.getFertileOrchardCount()
+    );
+
+    const fruitMagnetRadius = this.economyService.getFruitMagnetRadius();
+    if (fruitMagnetRadius > 0 && this.fruitManager.isFruitActive()) {
+      const fruitPos = this.fruitManager.getFruitPixelPos();
+      if (fruitPos) {
+        const dist = Math.hypot(this.pacman.x - fruitPos.x, this.pacman.y - fruitPos.y);
+        if (dist <= fruitMagnetRadius * 8) {
+          this.fruitManager.pullFruitTowards(this.pacman.x, this.pacman.y);
+        }
+      }
+    }
+
     const rawFruitPoints = this.fruitManager.checkPacmanCollision(this.pacman.x, this.pacman.y);
     if (rawFruitPoints > 0) {
       const fruitMult = this.economyService.getUpgrades().boostedFruits ? 1.5 : 1.0;
-      const points = Math.floor(rawFruitPoints * scoreMult * fruitMult);
+      const points = Math.floor(rawFruitPoints * scoreMult * fruitMult * masteryMult);
       this.hud.addScore(points);
       this.sound.playEatFruit();
       this.economyService.addCoins(50);
+      this.profileService.addXp(50);
       this.fruitsEatenSession++;
       
       this.achievementManager.increment('fruits_eaten_total', 1);
@@ -549,14 +632,16 @@ export class Game {
     });
 
     // 7. Colisões
-    this.checkGhostCollisions();
+    this.checkGhostCollisions(masteryMult);
   }
 
-  private handlePelletEating(pac: Pacman, isP2: boolean, scoreMult: number) {
+  private handlePelletEating(pac: Pacman, isP2: boolean, scoreMult: number, masteryMult: number = 1.0) {
     const eatResult = this.pelletManager.eatPellet(pac.tileX, pac.tileY);
     if (eatResult.isPellet) {
       const earnedCoins = eatResult.isEnergizer ? 5 : 1;
+      const earnedXp = eatResult.isEnergizer ? 5 : 1;
       this.economyService.addCoins(earnedCoins);
+      this.profileService.addXp(earnedXp);
       this.achievementManager.increment('coins_earned_total', earnedCoins);
       this.achievementManager.recordMax('piggy_bank_saved', this.economyService.getCoins());
 
@@ -567,8 +652,9 @@ export class Game {
         this.achievementManager.increment('energizers_eaten', 1);
       }
 
-      const extraLife = this.hud.addScore(eatResult.points * scoreMult, isP2);
-      this.achievementManager.increment('total_points_accumulated', eatResult.points * scoreMult);
+      const points = Math.floor(eatResult.points * scoreMult * masteryMult);
+      const extraLife = this.hud.addScore(points, isP2);
+      this.achievementManager.increment('total_points_accumulated', points);
       this.achievementManager.recordMax('high_score_tier', this.hud.getScore());
       if (extraLife) {
         pac.lives++;
@@ -652,7 +738,7 @@ export class Game {
     this.sound.startSiren(true);
   }
 
-  private checkGhostCollisions() {
+  private checkGhostCollisions(masteryMult: number = 1.0) {
     for (const ghost of this.ghosts) {
       const dist = Math.hypot(this.pacman.x - ghost.x, this.pacman.y - ghost.y);
       if (dist < 6.5) {
@@ -660,10 +746,12 @@ export class Game {
           ghost.setMode(GhostMode.EATEN, false);
           const score = SCORES.GHOST[Math.min(this.ghostEatCombo, 3)];
           this.ghostEatCombo++;
-          this.hud.addScore(score);
-          this.hud.showGhostScore(score, ghost.x, ghost.y);
+          const finalScore = Math.floor(score * masteryMult);
+          this.hud.addScore(finalScore);
+          this.hud.showGhostScore(finalScore, ghost.x, ghost.y);
           this.sound.playEatGhost();
           this.economyService.addCoins(20);
+          this.profileService.addXp(25);
           this.achievementManager.increment('coins_earned_total', 20);
 
           this.achievementManager.increment('ghosts_eaten_total', 1);

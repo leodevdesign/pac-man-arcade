@@ -24,8 +24,39 @@
   </head>
   <body>
     <div class="main-layout">
-      <!-- Painel Lateral Esquerdo: Configurações, Laboratório e Lojinha -->
+      <!-- Painel Lateral Esquerdo: Perfil, Configurações, Laboratório e Lojinha -->
       <aside class="arcade-side-panel">
+        <!-- 🌟 Card de Perfil & Nível de Jogador -->
+        <div class="info-card profile-card" id="profileCard">
+          <div class="profile-header">
+            <div class="profile-avatar-frame" id="profileAvatarFrame">
+              <span class="profile-avatar-icon" id="profileAvatarIcon">🟡</span>
+            </div>
+            <div class="profile-meta">
+              <div class="profile-level-badge" id="profileLevelBadge">LVL 1</div>
+              <div class="profile-title" id="profileTitle">🥉 Novato do Fliperama</div>
+            </div>
+          </div>
+
+          <div class="profile-xp-container">
+            <div class="profile-xp-labels">
+              <span class="xp-label-text">EXPERIÊNCIA</span>
+              <span class="xp-label-val" id="profileXpText">0 / 100 XP (0%)</span>
+            </div>
+            <div class="profile-xp-track">
+              <div class="profile-xp-fill" id="profileXpFill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="profile-mastery-tag" id="profileMasteryTag">
+            ✨ Maestria: <strong>+0% Pontos Globais</strong>
+          </div>
+
+          <button class="btn-chest-reward hidden" id="btnOpenChestReward">
+            🎁 <strong>1 Baú para Abrir!</strong>
+          </button>
+        </div>
+
         <div class="info-card">
           <h2 class="info-card-title">🎮 CONFIGURAÇÕES</h2>
           <div class="control-field">

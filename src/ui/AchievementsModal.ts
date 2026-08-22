@@ -29,11 +29,12 @@ export class AchievementsModal {
     if (!listEl) return;
 
     const list = this.achievementManager.getAchievements();
-    const { unlocked, total } = this.achievementManager.getTotalStars();
+    const unlocked = this.achievementManager.getUnlockedTiersCount();
+    const total = this.achievementManager.getTotalTiersCount();
 
     const progressEl = document.getElementById('achievementsProgress');
     if (progressEl) {
-      progressEl.innerHTML = `⭐ ${unlocked} / ${total} Estrelas`;
+      progressEl.innerHTML = `🏆 ${unlocked} / ${total} Níveis Desbloqueados`;
     }
 
     const filtered =
@@ -76,26 +77,27 @@ export class AchievementsModal {
   }
 
   /**
-   * Card Grande, Espaçoso e 100% Legível
+   * Card Grande, Espaçoso e 100% Legível com 5 Tiers
    */
   private createSpaciousCard(ach: ProgressiveAchievement): HTMLElement {
     const card = document.createElement('div');
     const unlockedCount = ach.tiers.filter((t) => t.unlocked).length;
-    const isCompleted = unlockedCount === 3;
+    const isCompleted = unlockedCount === 5;
 
     // Próxima meta ativa
     const currentTierIdx = ach.tiers.findIndex((t) => !t.unlocked);
-    const activeTier = currentTierIdx === -1 ? ach.tiers[2] : ach.tiers[currentTierIdx];
-    const currentTierNumber = currentTierIdx === -1 ? 3 : currentTierIdx + 1;
+    const activeTier = currentTierIdx === -1 ? ach.tiers[4] : ach.tiers[currentTierIdx];
+    const currentTierNumber = currentTierIdx === -1 ? 5 : currentTierIdx + 1;
 
     const progressPercent = Math.min(100, Math.round((ach.currentValue / activeTier.target) * 100));
 
-    // Estrelas grandes e brilhantes
-    const starBadges = `
-      <span class="ach-big-star ${unlockedCount >= 1 ? 'gold' : 'dim'}">★</span>
-      <span class="ach-big-star ${unlockedCount >= 2 ? 'gold' : 'dim'}">★</span>
-      <span class="ach-big-star ${unlockedCount >= 3 ? 'gold' : 'dim'}">★</span>
-    `;
+    // 5 Badges de Estrelas / Diamantes
+    const tierIcons = ['⭐', '⭐⭐', '⭐⭐⭐', '💎', '👑'];
+    const starBadges = ach.tiers.map((t, idx) => `
+      <span class="ach-tier-badge ${t.unlocked ? 'unlocked' : 'locked'}" title="${t.name}">
+        ${tierIcons[idx]}
+      </span>
+    `).join('');
 
     card.className = `ach-card-spacious ${unlockedCount > 0 ? 'card-active' : ''} ${isCompleted ? 'card-mastered' : ''}`;
     card.innerHTML = `
@@ -113,10 +115,10 @@ export class AchievementsModal {
       <div class="ach-card-middle">
         ${
           isCompleted
-            ? `<div class="ach-mission-complete">🏆 CONQUISTA MAXIMIZADA! (${activeTier.target.toLocaleString()} ${ach.unit})</div>`
+            ? `<div class="ach-mission-complete">👑 CONQUISTA MÍTICA MAXIMIZADA! (${activeTier.target.toLocaleString()} ${ach.unit})</div>`
             : `
               <div class="ach-mission-current">
-                <span class="ach-tier-tag">NÍVEL ${currentTierNumber}</span>
+                <span class="ach-tier-tag">NÍVEL ${currentTierNumber} (${activeTier.name})</span>
                 <span class="ach-mission-goal">${ach.description}: <strong>${activeTier.target.toLocaleString()} ${ach.unit}</strong></span>
               </div>
             `
@@ -129,7 +131,7 @@ export class AchievementsModal {
         </div>
         <div class="ach-bar-details">
           <span class="ach-bar-numbers">${ach.currentValue.toLocaleString()} / ${activeTier.target.toLocaleString()} ${ach.unit}</span>
-          <span class="ach-reward-tag">${isCompleted ? '⭐ 100%' : `+${activeTier.rewardCoins} 🪙`}</span>
+          <span class="ach-reward-tag">${isCompleted ? '👑 100%' : `+${activeTier.rewardCoins.toLocaleString()} 🪙 & +${activeTier.rewardXp.toLocaleString()} ⭐ XP`}</span>
         </div>
       </div>
     `;

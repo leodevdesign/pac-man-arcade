@@ -5,36 +5,59 @@ export class FruitManager {
   private fruitTimer: number = 0;
   private scoreText: string = '';
   private scoreTimer: number = 0;
-  private spawn1Triggered: boolean = false;
-  private spawn2Triggered: boolean = false;
+  private spawnsTriggered: boolean[] = [false, false, false, false, false];
 
-  public readonly fruitX: number = 13.5 * TILE_SIZE;
-  public readonly fruitY: number = 20 * TILE_SIZE + TILE_SIZE / 2;
+  public currFruitX: number = 13.5 * TILE_SIZE;
+  public currFruitY: number = 20 * TILE_SIZE + TILE_SIZE / 2;
 
   public resetForLevel() {
     this.activeFruit = null;
     this.fruitTimer = 0;
     this.scoreText = '';
     this.scoreTimer = 0;
-    this.spawn1Triggered = false;
-    this.spawn2Triggered = false;
+    this.spawnsTriggered = [false, false, false, false, false];
+    this.currFruitX = 13.5 * TILE_SIZE;
+    this.currFruitY = 20 * TILE_SIZE + TILE_SIZE / 2;
   }
 
-  public checkPelletSpawns(dotsEaten: number, currentLevel: number) {
-    const fruitConfig = this.getFruitForLevel(currentLevel);
+  public isFruitActive(): boolean {
+    return this.activeFruit !== null;
+  }
 
-    if (dotsEaten >= 70 && !this.spawn1Triggered) {
-      this.spawn1Triggered = true;
-      this.spawnFruit(fruitConfig);
-    } else if (dotsEaten >= 170 && !this.spawn2Triggered) {
-      this.spawn2Triggered = true;
-      this.spawnFruit(fruitConfig);
+  public getFruitPixelPos(): { x: number; y: number } | null {
+    if (!this.activeFruit) return null;
+    return { x: this.currFruitX, y: this.currFruitY };
+  }
+
+  public pullFruitTowards(targetX: number, targetY: number, speed: number = 1.2) {
+    if (!this.activeFruit) return;
+    const dx = targetX - this.currFruitX;
+    const dy = targetY - this.currFruitY;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 2) {
+      this.currFruitX += (dx / dist) * speed;
+      this.currFruitY += (dy / dist) * speed;
+    }
+  }
+
+  public checkPelletSpawns(dotsEaten: number, currentLevel: number, maxSpawns: number = 2) {
+    const fruitConfig = this.getFruitForLevel(currentLevel);
+    const thresholds = [50, 110, 160, 200, 230];
+
+    for (let i = 0; i < maxSpawns && i < thresholds.length; i++) {
+      if (dotsEaten >= thresholds[i] && !this.spawnsTriggered[i]) {
+        this.spawnsTriggered[i] = true;
+        this.spawnFruit(fruitConfig);
+        break;
+      }
     }
   }
 
   private spawnFruit(fruit: FruitConfig) {
     this.activeFruit = fruit;
-    this.fruitTimer = 9500; // 9.5 segundos
+    this.fruitTimer = 10000; // 10 segundos
+    this.currFruitX = 13.5 * TILE_SIZE;
+    this.currFruitY = 20 * TILE_SIZE + TILE_SIZE / 2;
   }
 
   public getFruitForLevel(level: number): FruitConfig {
@@ -64,8 +87,8 @@ export class FruitManager {
   public checkPacmanCollision(pacmanX: number, pacmanY: number): number {
     if (!this.activeFruit) return 0;
 
-    const dist = Math.hypot(pacmanX - this.fruitX, pacmanY - this.fruitY);
-    if (dist < 8) {
+    const dist = Math.hypot(pacmanX - this.currFruitX, pacmanY - this.currFruitY);
+    if (dist < 10) {
       const points = this.activeFruit.points;
       this.scoreText = `${points}`;
       this.scoreTimer = 1500;
@@ -81,7 +104,7 @@ export class FruitManager {
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(this.activeFruit.icon, this.fruitX, this.fruitY);
+      ctx.fillText(this.activeFruit.icon, this.currFruitX, this.currFruitY);
       ctx.restore();
     }
 
@@ -91,7 +114,7 @@ export class FruitManager {
       ctx.font = 'bold 8px "Courier New", monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(this.scoreText, this.fruitX, this.fruitY);
+      ctx.fillText(this.scoreText, this.currFruitX, this.currFruitY);
       ctx.restore();
     }
   }
