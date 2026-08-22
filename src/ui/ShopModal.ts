@@ -74,12 +74,20 @@ export class ShopModal {
     });
 
     // Wire Upgrades Buttons
-    contentBox.querySelectorAll('.btn-buy-upgrade').forEach((btn) => {
+    contentBox.querySelectorAll('.btn-buy-upgrade, .shop-action-btn:not([disabled])').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
         const key = target.dataset.key as keyof MultiLevelUpgrades;
         if (key && this.economyService.upgrade(key)) {
           this.render();
+          const coinsDisplay = document.getElementById('shopCoinsAmount');
+          if (coinsDisplay) {
+            coinsDisplay.innerText = `${this.economyService.getCoins().toLocaleString()} 🪙`;
+          }
+          const headerCoins = document.getElementById('headerCoinsCounter');
+          if (headerCoins) {
+            headerCoins.innerText = `${this.economyService.getCoins().toLocaleString()} 🪙`;
+          }
         }
       });
     });

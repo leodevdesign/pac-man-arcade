@@ -403,11 +403,12 @@ export class Game {
           this.maze.isFlashing = false;
         }
         if (this.stateTimer <= 0) {
-          // Bônus Especial: passar a fase sem morrer concede +1 VIDA EXTRA ACUMULADA!
+          // Recompensa de Conclusão de Fase: +1 VIDA EXTRA garantida a cada nível concluído!
+          this.pacman.lives++;
+          this.pacman2.lives++;
+          this.sound.playExtraLife();
+
           if (this.deathsThisLevel === 0) {
-            this.pacman.lives++;
-            this.pacman2.lives++;
-            this.sound.playExtraLife();
             this.achievementManager.increment('untouchable_streak', 1);
           }
           if (this.pacman.lives === 1) {

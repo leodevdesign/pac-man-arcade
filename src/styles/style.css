@@ -611,7 +611,10 @@ html, body {
 .editor-content.modal-fullscreen {
   max-width: 95vw;
   width: 95vw;
-  max-height: 92vh;
+  height: 88vh;
+  min-height: 88vh;
+  max-height: 88vh;
+  box-sizing: border-box;
 }
 
 /* Modal do Estúdio de Labirintos Compacto e Centralizado (~54% da tela) */
@@ -799,10 +802,17 @@ html, body {
   box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
 }
 
+#achievementsList {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .achievements-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 12px;
+  align-content: start;
 }
 
 .ach-card-spacious {
@@ -962,21 +972,26 @@ html, body {
   border-radius: 10px;
 }
 
-/* =========================================================================
- * 🏪 LOJINHA DE UPGRADES & SKINS
- * ========================================================================= */
-.shop-tabs-nav {
+.shop-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
   display: flex;
-  gap: 10px;
-  border-bottom: 1.5px solid rgba(168, 85, 247, 0.2);
-  padding-bottom: 12px;
+  flex-direction: column;
+}
+
+.shop-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .shop-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 14px;
   margin-top: 12px;
+  align-content: start;
 }
 
 .shop-card {
