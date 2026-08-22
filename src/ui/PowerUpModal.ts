@@ -17,45 +17,13 @@ export class PowerUpModal {
 
   constructor(economyService: EconomyService) {
     this.economyService = economyService;
-    this.createModalDOM();
+    this.modalEl = document.getElementById('powerUpModal');
+    this.closeBtnEl = document.getElementById('btnClosePowerUpModal');
     this.initEvents();
   }
 
   public setSound(sound: SoundSynthesizer) {
     this.sound = sound;
-  }
-
-  private createModalDOM() {
-    let existing = document.getElementById('powerUpModal');
-    if (existing) {
-      this.modalEl = existing;
-      this.closeBtnEl = document.getElementById('btnClosePowerUpModal');
-      return;
-    }
-
-    const modal = document.createElement('div');
-    modal.id = 'powerUpModal';
-    modal.className = 'arcade-modal-overlay hidden';
-    modal.innerHTML = `
-      <div class="arcade-modal-box powerup-modal-box">
-        <div class="arcade-modal-header">
-          <h2 class="arcade-modal-title">⚡ ARSENAL DE POWER-UPS</h2>
-          <button class="arcade-modal-close" id="btnClosePowerUpModal">✕</button>
-        </div>
-
-        <div class="powerup-modal-body">
-          <p class="powerup-modal-intro">
-            Estes são os itens especiais que surgem dinamicamente no labirinto. Aprimore o poder de cada um para dominar as partidas:
-          </p>
-
-          <div class="powerup-grid" id="powerUpModalGrid"></div>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-    this.modalEl = modal;
-    this.closeBtnEl = document.getElementById('btnClosePowerUpModal');
   }
 
   private initEvents() {
@@ -65,13 +33,13 @@ export class PowerUpModal {
     });
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.modalEl && !this.modalEl.classList.contains('hidden')) {
+      if (e.key === 'Escape' && this.modalEl?.classList.contains('open')) {
         this.hide();
       }
     });
 
     this.economyService.onCoinsChanged(() => {
-      if (this.modalEl && !this.modalEl.classList.contains('hidden')) {
+      if (this.modalEl?.classList.contains('open')) {
         this.render();
       }
     });
@@ -79,13 +47,11 @@ export class PowerUpModal {
 
   public show() {
     this.render();
-    this.modalEl?.classList.remove('hidden');
     this.modalEl?.classList.add('open');
   }
 
   public hide() {
     this.modalEl?.classList.remove('open');
-    this.modalEl?.classList.add('hidden');
   }
 
   public render() {
