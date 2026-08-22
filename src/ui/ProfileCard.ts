@@ -78,8 +78,8 @@ export class ProfileCard {
         chestButton.removeAttribute('disabled');
       } else {
         chestButton.className = 'btn-chest-reward empty-reward';
-        chestButton.innerHTML = `🎁 <span>0 Baús Disponíveis (Suba de Nível)</span>`;
-        chestButton.setAttribute('disabled', 'true');
+        chestButton.innerHTML = `🎁 <span>0 Baús (Suba de Nível)</span>`;
+        chestButton.removeAttribute('disabled');
       }
     }
   }

@@ -52,8 +52,8 @@
             ✨ Maestria: <strong>+0% Pontos Globais</strong>
           </div>
 
-          <button class="btn-chest-reward empty-reward" id="btnOpenChestReward" disabled>
-            🎁 <span>0 Baús Disponíveis (Suba de Nível)</span>
+          <button class="btn-chest-reward empty-reward" id="btnOpenChestReward">
+            🎁 <span>0 Baús (Suba de Nível)</span>
           </button>
         </div>
 
@@ -143,86 +143,108 @@
         </section>
       </main>
 
-      <!-- Painel Lateral Direito: Ações Rápidas, IAs e Informações -->
-      <aside class="arcade-side-panel">
-        <div class="info-card">
-          <h2 class="info-card-title">🕹️ AÇÕES RÁPIDAS</h2>
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <button class="action-btn" id="btnPause">⏸️ Pausa [P]</button>
-            <button class="action-btn" id="btnMute">🔊 Efeitos Som [M]</button>
-            <button class="action-btn" id="btnSiren">🚨 Sirene: OFF [S]</button>
-            <button class="action-btn" id="btnDebug">🧠 IAs Debug [H]</button>
-            <button class="action-btn active" id="btnCrt">📺 CRT Scanlines</button>
-            <button class="action-btn" id="btnFullscreen">⛶ Tela Cheia</button>
+      <!-- Painel Lateral Direito: Ações Rápidas, IAs e Informações (Acordeom Inteligente) -->
+      <aside class="arcade-side-panel" id="rightAccordionPanel">
+        <!-- Card 1: Ações Rápidas -->
+        <div class="info-card accordion-card open" id="cardQuickActions">
+          <div class="accordion-header" data-card="cardQuickActions">
+            <h2 class="info-card-title">🕹️ AÇÕES RÁPIDAS</h2>
+            <span class="accordion-arrow">▲</span>
+          </div>
+          <div class="accordion-body">
+            <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px;">
+              <button class="action-btn" id="btnPause">⏸️ Pausa [P]</button>
+              <button class="action-btn" id="btnMute">🔊 Efeitos Som [M]</button>
+              <button class="action-btn" id="btnSiren">🚨 Sirene: OFF [S]</button>
+              <button class="action-btn" id="btnDebug">🧠 IAs Debug [H]</button>
+              <button class="action-btn active" id="btnCrt">📺 CRT Scanlines</button>
+              <button class="action-btn" id="btnFullscreen">⛶ Tela Cheia</button>
+            </div>
           </div>
         </div>
 
-        <div class="info-card interactive-info-card" id="cardGhostsGuide" title="Clique para abrir o Bestiário dos Fantasmas">
-          <h2 class="info-card-title">
-            <span>👾 FANTASMAS</span>
-            <span class="card-action-badge">📖 Bestiário</span>
-          </h2>
-          <div class="ghost-list">
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-blinky"></span>
-              <div><strong>BLINKY</strong> (Persegue)</div>
-            </div>
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-pinky"></span>
-              <div><strong>PINKY</strong> (Emboscada)</div>
-            </div>
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-inky"></span>
-              <div><strong>INKY</strong> (Pinça Dupla)</div>
-            </div>
-            <div class="ghost-item">
-              <span class="ghost-dot ghost-clyde"></span>
-              <div><strong>CLYDE</strong> (Covarde 8t)</div>
-            </div>
+        <!-- Card 2: Fantasmas -->
+        <div class="info-card accordion-card open" id="cardGhosts">
+          <div class="accordion-header" data-card="cardGhosts">
+            <h2 class="info-card-title">👾 FANTASMAS</h2>
+            <span class="accordion-arrow">▲</span>
           </div>
-          <div class="card-click-hint">👆 Clique para ver IAs e Histórias</div>
+          <div class="accordion-body">
+            <div class="ghost-list" style="padding-top: 6px;">
+              <div class="ghost-item">
+                <span class="ghost-dot ghost-blinky"></span>
+                <div><strong>BLINKY</strong> (Persegue)</div>
+              </div>
+              <div class="ghost-item">
+                <span class="ghost-dot ghost-pinky"></span>
+                <div><strong>PINKY</strong> (Emboscada)</div>
+              </div>
+              <div class="ghost-item">
+                <span class="ghost-dot ghost-inky"></span>
+                <div><strong>INKY</strong> (Pinça Dupla)</div>
+              </div>
+              <div class="ghost-item">
+                <span class="ghost-dot ghost-clyde"></span>
+                <div><strong>CLYDE</strong> (Covarde 8t)</div>
+              </div>
+            </div>
+            <button class="btn-card-action" id="btnOpenGhostsGuide">📖 Ver IAs e Histórias</button>
+          </div>
         </div>
 
-        <div class="info-card interactive-info-card" id="cardPowerUpsGuide" title="Clique para abrir o Arsenal de Power-ups">
-          <h2 class="info-card-title">
-            <span>⚡ POWER-UPS</span>
-            <span class="card-action-badge">💣 Arsenal</span>
-          </h2>
-          <div class="controls-list">
-            <div class="control-row">
-              <span>💣 Bomba Flash</span>
-              <span class="key-tag">Stun Área</span>
-            </div>
-            <div class="control-row">
-              <span>🧲 Super Ímã</span>
-              <span class="key-tag">Atrai Pastilhas</span>
-            </div>
-            <div class="control-row">
-              <span>🛡️ Escudo</span>
-              <span class="key-tag">Bloqueia Dano</span>
-            </div>
-            <div class="control-row">
-              <span>⏳ Gelo</span>
-              <span class="key-tag">Congela Todos</span>
-            </div>
+        <!-- Card 3: Power-ups -->
+        <div class="info-card accordion-card open" id="cardPowerUps">
+          <div class="accordion-header" data-card="cardPowerUps">
+            <h2 class="info-card-title">⚡ POWER-UPS</h2>
+            <span class="accordion-arrow">▲</span>
           </div>
-          <div class="card-click-hint">👆 Clique para Evoluir Itens</div>
+          <div class="accordion-body">
+            <div class="controls-list" style="padding-top: 6px;">
+              <div class="control-row">
+                <span>💣 Bomba Flash</span>
+                <span class="key-tag">Stun Área</span>
+              </div>
+              <div class="control-row">
+                <span>🧲 Super Ímã</span>
+                <span class="key-tag">Atrai Pastilhas</span>
+              </div>
+              <div class="control-row">
+                <span>🛡️ Escudo</span>
+                <span class="key-tag">Bloqueia Dano</span>
+              </div>
+              <div class="control-row">
+                <span>⏳ Gelo</span>
+                <span class="key-tag">Congela Todos</span>
+              </div>
+            </div>
+            <button class="btn-card-action" id="btnOpenPowerUpsGuide">⚡ Evoluir Power-ups</button>
+          </div>
         </div>
 
-        <div class="info-card">
-          <h2 class="info-card-title">⌨️ CONTROLES</h2>
-          <div class="controls-list">
-            <div class="control-row">
-              <span>P1 Mover</span>
-              <span class="key-tag">Setas</span>
-            </div>
-            <div class="control-row">
-              <span>P2 Mover</span>
-              <span class="key-tag">WASD</span>
-            </div>
-            <div class="control-row">
-              <span>Sirene Fundo</span>
-              <span class="key-tag">Tecla S</span>
+        <!-- Card 4: Controles -->
+        <div class="info-card accordion-card" id="cardControls">
+          <div class="accordion-header" data-card="cardControls">
+            <h2 class="info-card-title">⌨️ CONTROLES</h2>
+            <span class="accordion-arrow">▼</span>
+          </div>
+          <div class="accordion-body">
+            <div class="controls-list" style="padding-top: 6px;">
+              <div class="control-row">
+                <span>P1 Mover</span>
+                <span class="key-tag">Setas</span>
+              </div>
+              <div class="control-row">
+                <span>P2 Mover</span>
+                <span class="key-tag">WASD</span>
+              </div>
+              <div class="control-row">
+                <span>Teletransporte</span>
+                <span class="key-tag">Espaço</span>
+              </div>
+              <div class="control-row">
+                <span>Pausar</span>
+                <span class="key-tag">Tecla P</span>
+              </div>
             </div>
           </div>
         </div>

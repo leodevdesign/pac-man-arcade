@@ -1712,43 +1712,85 @@ body.theme-gameboy .arcade-title {
 }
 
 /* =========================================================================
- * 📖 CARDS INTERATIVOS DO PAINEL LATERAL
+ * 📖 CARDS ACORDEOM DO PAINEL LATERAL
  * ========================================================================= */
-.interactive-info-card {
+.accordion-card {
+  transition: all 0.25s ease;
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+}
+
+.accordion-header .info-card-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.accordion-arrow {
+  font-size: 11px;
+  color: #c084fc;
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.accordion-header:hover .accordion-arrow {
+  color: #ffd700;
+}
+
+.accordion-body {
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.accordion-card.open .accordion-body {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.accordion-card:not(.open) .accordion-body {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+  pointer-events: none;
+}
+
+.btn-card-action {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 8px;
+  color: #f3e8ff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  position: relative;
-}
-
-.interactive-info-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(168, 85, 247, 0.6) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 12px rgba(168, 85, 247, 0.2) !important;
-}
-
-.card-action-badge {
-  font-size: 10px;
-  background: rgba(168, 85, 247, 0.2);
-  border: 1px solid rgba(168, 85, 247, 0.4);
-  color: #d8b4fe;
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-weight: 700;
-}
-
-.card-click-hint {
-  font-size: 10px;
-  color: #a78bfa;
   text-align: center;
-  margin-top: 4px;
-  font-weight: 600;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.interactive-info-card:hover .card-click-hint {
-  opacity: 1;
-  color: #fde047;
+.btn-card-action:hover {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(124, 58, 237, 0.4));
+  border-color: #d8b4fe;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.3);
+  transform: translateY(-1px);
 }
 
 /* =========================================================================

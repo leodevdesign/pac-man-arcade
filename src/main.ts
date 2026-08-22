@@ -57,8 +57,52 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btnOpenShop')?.addEventListener('click', () => shopModal.open());
   document.getElementById('btnOpenAchievements')?.addEventListener('click', () => achievementsModal.open());
   document.getElementById('btnOpenLeaderboard')?.addEventListener('click', () => leaderboardModal.open());
-  document.getElementById('cardGhostsGuide')?.addEventListener('click', () => ghostGuideModal.show());
-  document.getElementById('cardPowerUpsGuide')?.addEventListener('click', () => powerUpModal.show());
+  document.getElementById('btnOpenGhostsGuide')?.addEventListener('click', () => ghostGuideModal.show());
+  document.getElementById('btnOpenPowerUpsGuide')?.addEventListener('click', () => powerUpModal.show());
+
+  // Controlador de Acordeom Inteligente dos 4 Cards da Direita (Máx 3 Abertos)
+  const openCardsHistory: string[] = ['cardQuickActions', 'cardGhosts', 'cardPowerUps'];
+  const MAX_OPEN_CARDS = 3;
+
+  const updateCardDOMState = (cardId: string, isOpen: boolean) => {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    const arrow = card.querySelector('.accordion-arrow');
+    if (isOpen) {
+      card.classList.add('open');
+      if (arrow) arrow.textContent = '▲';
+    } else {
+      card.classList.remove('open');
+      if (arrow) arrow.textContent = '▼';
+    }
+  };
+
+  document.querySelectorAll('.accordion-header').forEach((header) => {
+    header.addEventListener('click', (e) => {
+      const cardId = (e.currentTarget as HTMLElement).dataset.card;
+      if (!cardId) return;
+
+      const card = document.getElementById(cardId);
+      if (!card) return;
+
+      const isOpen = card.classList.contains('open');
+
+      if (isOpen) {
+        // Fecha o card clicado
+        updateCardDOMState(cardId, false);
+        const idx = openCardsHistory.indexOf(cardId);
+        if (idx !== -1) openCardsHistory.splice(idx, 1);
+      } else {
+        // Abre o card clicado com limite de 3
+        if (openCardsHistory.length >= MAX_OPEN_CARDS) {
+          const oldestCardId = openCardsHistory.shift();
+          if (oldestCardId) updateCardDOMState(oldestCardId, false);
+        }
+        updateCardDOMState(cardId, true);
+        openCardsHistory.push(cardId);
+      }
+    });
+  });
 
   // Callback de Game Over para inserção de iniciais
   game.onGameOverCallback = (score, level, mode) => {

@@ -40,18 +40,28 @@ export class ChestModal {
   }
 
   public openForLevelUp(newLevel: number, _rewardCoins: number) {
-    this.renderChestView(`🎉 SUBIU PARA O NÍVEL ${newLevel}!`, `Você conquistou um Baú do Tesouro Arcade! Clique para abrir:`);
+    this.renderChestView(`🎉 SUBIU PARA O NÍVEL ${newLevel}!`, `Você conquistou um Baú do Tesouro Arcade! Clique para abrir:`, true);
     this.modalEl?.classList.remove('hidden');
+    this.modalEl?.classList.add('open');
   }
 
   public openManual() {
     const data = this.profileService.getProfileData();
-    if (data.unclaimedChests <= 0) return;
-    this.renderChestView(`🎁 BAÚ DO TESOURO DISPONÍVEL!`, `Você tem ${data.unclaimedChests} baú(s) para abrir. Clique no baú para resgatar sua recompensa:`);
+    if (data.unclaimedChests > 0) {
+      this.renderChestView(`🎁 BAÚ DO TESOURO DISPONÍVEL!`, `Você tem ${data.unclaimedChests} baú(s) para abrir. Clique no baú para resgatar sua recompensa:`, true);
+    } else {
+      this.renderChestView(`🎁 BAÚS DO TESOURO ARCADE`, `Você está no Nível ${data.level}. Continue jogando e suba de nível para resgatar baús repletos de moedas e temas exclusivos!`, false);
+    }
     this.modalEl?.classList.remove('hidden');
+    this.modalEl?.classList.add('open');
   }
 
-  private renderChestView(title: string, subtitle: string) {
+  public close() {
+    this.modalEl?.classList.remove('open');
+    this.modalEl?.classList.add('hidden');
+  }
+
+  private renderChestView(title: string, subtitle: string, canOpen: boolean) {
     if (!this.modalEl) return;
     this.isChestOpened = false;
 
@@ -64,10 +74,10 @@ export class ChestModal {
         </div>
         <div class="chest-body">
           <p class="chest-subtitle">${subtitle}</p>
-          <div class="interactive-chest-container" id="interactiveChest">
+          <div class="interactive-chest-container ${canOpen ? 'pulse-hover' : ''}" id="interactiveChest">
             <div class="chest-icon-glow"></div>
-            <div class="chest-pixel-art pulse-hover" id="chestIcon">🎁</div>
-            <div class="chest-tap-hint" id="chestTapHint">👆 CLIQUE PARA ABRIR!</div>
+            <div class="chest-pixel-art" id="chestIcon">${canOpen ? '🎁' : '🔒📦'}</div>
+            <div class="chest-tap-hint" id="chestTapHint">${canOpen ? '👆 CLIQUE PARA ABRIR!' : '✨ Ganhe baús ao subir de nível!'}</div>
           </div>
           <div class="chest-reward-area hidden" id="chestRewardArea"></div>
         </div>
@@ -75,7 +85,9 @@ export class ChestModal {
     `;
 
     document.getElementById('btnCloseChest')?.addEventListener('click', () => this.close());
-    document.getElementById('interactiveChest')?.addEventListener('click', () => this.triggerOpenChest());
+    if (canOpen) {
+      document.getElementById('interactiveChest')?.addEventListener('click', () => this.triggerOpenChest());
+    }
   }
 
   private triggerOpenChest() {
@@ -140,9 +152,5 @@ export class ChestModal {
 
       setTimeout(() => confetti.remove(), 1800);
     }
-  }
-
-  public close() {
-    this.modalEl?.classList.add('hidden');
   }
 }

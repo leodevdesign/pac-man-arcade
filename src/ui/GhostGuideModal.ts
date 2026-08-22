@@ -135,9 +135,11 @@ export class GhostGuideModal {
 
   public show() {
     this.modalEl?.classList.remove('hidden');
+    this.modalEl?.classList.add('open');
   }
 
   public hide() {
+    this.modalEl?.classList.remove('open');
     this.modalEl?.classList.add('hidden');
   }
 }

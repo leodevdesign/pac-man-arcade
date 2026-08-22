@@ -80,9 +80,11 @@ export class PowerUpModal {
   public show() {
     this.render();
     this.modalEl?.classList.remove('hidden');
+    this.modalEl?.classList.add('open');
   }
 
   public hide() {
+    this.modalEl?.classList.remove('open');
     this.modalEl?.classList.add('hidden');
   }
 
