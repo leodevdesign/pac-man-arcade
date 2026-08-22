@@ -43,7 +43,6 @@ export class PowerUpManager {
   public magnetTimer: number = 0;
   public freezeTimer: number = 0;
 
-  // Efeito de onda de choque visual (Bomba)
   public shockwave: Shockwave = {
     x: 0,
     y: 0,
@@ -52,6 +51,10 @@ export class PowerUpManager {
     color: '#FF3D00',
     active: false,
   };
+
+  // Callbacks para sincronização com o jogo
+  public onEnergizerTriggered: (() => void) | null = null;
+  public onPelletEaten: ((points: number) => void) | null = null;
 
   constructor() {
     this.reset();
@@ -231,11 +234,21 @@ export class PowerUpManager {
         const ty = pacTileY + dy;
 
         const distTiles = Math.hypot(dx, dy);
-        if (distTiles <= tileRadius && Math.random() < 0.2) {
+        if (distTiles <= tileRadius && Math.random() < 0.25) {
           const eatResult = pelletManager.eatPellet(tx, ty);
           if (eatResult.isPellet) {
             hud.addScore(eatResult.points);
             sound.playWaka();
+
+            if (eatResult.isEnergizer) {
+              if (this.onEnergizerTriggered) {
+                this.onEnergizerTriggered();
+              }
+            } else {
+              if (this.onPelletEaten) {
+                this.onPelletEaten(eatResult.points);
+              }
+            }
           }
         }
       }

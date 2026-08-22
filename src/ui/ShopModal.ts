@@ -7,11 +7,13 @@ import {
 import { PacmanSkin } from '../core/Constants.ts';
 import { ThemeManager } from './ThemeManager.ts';
 
+const POWERUP_KEYS = ['superMagnet', 'bombDuration', 'shieldCharges', 'freezeDuration', 'boostedFruits'];
+
 export class ShopModal {
   private modalEl: HTMLElement | null = null;
   private economyService: EconomyService;
   private themeManager: ThemeManager;
-  private currentTab: 'upgrades' | 'skins' = 'upgrades';
+  private currentTab: 'passives' | 'powerups' | 'skins' = 'passives';
   private selectedSkinCategory: string = 'all';
   private onSkinEquippedCallbacks: ((skin: PacmanSkin) => void)[] = [];
 
@@ -26,7 +28,8 @@ export class ShopModal {
     this.onSkinEquippedCallbacks.push(cb);
   }
 
-  public open() {
+  public open(tab?: 'passives' | 'powerups' | 'skins') {
+    if (tab) this.currentTab = tab;
     this.modalEl?.classList.add('open');
     this.render();
   }
@@ -48,11 +51,17 @@ export class ShopModal {
 
     if (!contentBox) return;
 
+    const passivesCount = UPGRADE_DEFINITIONS.filter((d) => !POWERUP_KEYS.includes(d.key)).length;
+    const powerupsCount = UPGRADE_DEFINITIONS.filter((d) => POWERUP_KEYS.includes(d.key)).length;
+
     contentBox.innerHTML = `
       <!-- Abas de Navegação da Loja -->
       <div class="shop-tabs-nav">
-        <button class="shop-tab-btn ${this.currentTab === 'upgrades' ? 'active' : ''}" id="tabUpgrades">
-          ⚡ Upgrades Permanentes (${UPGRADE_DEFINITIONS.length})
+        <button class="shop-tab-btn ${this.currentTab === 'passives' ? 'active' : ''}" id="tabPassives">
+          ⚡ Passivas & Início (${passivesCount})
+        </button>
+        <button class="shop-tab-btn ${this.currentTab === 'powerups' ? 'active' : ''}" id="tabPowerups">
+          💣 Power-ups (${powerupsCount})
         </button>
         <button class="shop-tab-btn ${this.currentTab === 'skins' ? 'active' : ''}" id="tabSkins">
           🎨 Skins Temáticas (${SKIN_DEFINITIONS.length})
@@ -60,13 +69,23 @@ export class ShopModal {
       </div>
 
       <div class="shop-tab-content">
-        ${this.currentTab === 'upgrades' ? this.renderUpgradesList() : this.renderSkinsList()}
+        ${
+          this.currentTab === 'passives'
+            ? this.renderUpgradesList(false)
+            : this.currentTab === 'powerups'
+            ? this.renderUpgradesList(true)
+            : this.renderSkinsList()
+        }
       </div>
     `;
 
     // Wire Tabs
-    contentBox.querySelector('#tabUpgrades')?.addEventListener('click', () => {
-      this.currentTab = 'upgrades';
+    contentBox.querySelector('#tabPassives')?.addEventListener('click', () => {
+      this.currentTab = 'passives';
+      this.render();
+    });
+    contentBox.querySelector('#tabPowerups')?.addEventListener('click', () => {
+      this.currentTab = 'powerups';
       this.render();
     });
     contentBox.querySelector('#tabSkins')?.addEventListener('click', () => {
@@ -128,12 +147,15 @@ export class ShopModal {
     });
   }
 
-  private renderUpgradesList(): string {
+  private renderUpgradesList(onlyPowerups: boolean): string {
     const currentCoins = this.economyService.getCoins();
+    const list = UPGRADE_DEFINITIONS.filter((def) =>
+      onlyPowerups ? POWERUP_KEYS.includes(def.key) : !POWERUP_KEYS.includes(def.key)
+    );
 
     return `
       <div class="shop-grid">
-        ${UPGRADE_DEFINITIONS.map((def) => {
+        ${list.map((def) => {
           const lvl = this.economyService.getUpgradeLevel(def.key);
           const isMax = lvl >= def.maxLevel;
           const price = this.economyService.getUpgradePrice(def.key);

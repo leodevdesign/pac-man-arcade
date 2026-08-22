@@ -67,7 +67,7 @@ export class InputManager {
 
         // Ações Globais
         case 'KeyP':
-        case 'Space':
+        case 'Escape':
           if (this.onPauseCallback) this.onPauseCallback();
           break;
         case 'KeyM':

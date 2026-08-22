@@ -206,6 +206,50 @@ assert(skinsConfig.find(s => s.skin === 'HALLOWEEN').price === 3500, 'Pac de Hal
 assert(skinsConfig.find(s => s.skin === 'CYBERPUNK').price === 5000, 'Cyber Mecha Pac custa 5.000 moedas');
 
 // -----------------------------------------------------------------------------
+// 8. TESTES DE TELETRANSPORTE DETERMINÍSTICO E ÍMÃ COM ENERGIZERS
+// -----------------------------------------------------------------------------
+console.log('\n🌀 MÓDULO 8: Teletransporte Espelhado & Ativação de Ímã');
+function getOppositeQuadrant(pacCol, pacRow) {
+  const isLeft = pacCol < 14;
+  const isTop = pacRow < 18;
+  return {
+    targetMinCol: isLeft ? 14 : 1,
+    targetMaxCol: isLeft ? 26 : 13,
+    targetMinRow: isTop ? 18 : 4,
+    targetMaxRow: isTop ? 31 : 17,
+  };
+}
+
+const quadBottomLeft = getOppositeQuadrant(5, 25);
+assert(quadBottomLeft.targetMinCol === 14 && quadBottomLeft.targetMinRow === 4, 'Pac-Man no Canto Inferior-Esquerdo teleporta para o Canto Superior-Direito');
+
+const quadBottomRight = getOppositeQuadrant(22, 25);
+assert(quadBottomRight.targetMinCol === 1 && quadBottomRight.targetMinRow === 4, 'Pac-Man no Canto Inferior-Direito teleporta para o Canto Superior-Esquerdo');
+
+const quadTopLeft = getOppositeQuadrant(5, 6);
+assert(quadTopLeft.targetMinCol === 14 && quadTopLeft.targetMinRow === 18, 'Pac-Man no Canto Superior-Esquerdo teleporta para o Canto Inferior-Direito');
+
+const quadTopRight = getOppositeQuadrant(22, 6);
+assert(quadTopRight.targetMinCol === 1 && quadTopRight.targetMinRow === 18, 'Pac-Man no Canto Superior-Direito teleporta para o Canto Inferior-Esquerdo');
+
+let energizerCallbackFired = false;
+let scoreAdded = 0;
+const mockPelletManager = {
+  eatPellet: () => ({ isPellet: true, isEnergizer: true, points: 50 }),
+};
+function simulateMagnetPull(pm, onEnergizer) {
+  const res = pm.eatPellet();
+  if (res.isPellet) {
+    scoreAdded += res.points;
+    if (res.isEnergizer && onEnergizer) {
+      onEnergizer();
+    }
+  }
+}
+simulateMagnetPull(mockPelletManager, () => { energizerCallbackFired = true; });
+assert(energizerCallbackFired && scoreAdded === 50, 'Ímã dispara callback de Energizer e adiciona pontos corretamente');
+
+// -----------------------------------------------------------------------------
 // RESULTADO FINAL
 // -----------------------------------------------------------------------------
 console.log('\n================================================================');

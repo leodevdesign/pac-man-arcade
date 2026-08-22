@@ -131,6 +131,23 @@ export class Game {
       this.profileService.addXp(xp);
     });
 
+    // Callbacks do PowerUpManager (Ativação de Energizers e Pastilhas puxadas pelo Ímã)
+    this.powerUpManager.onEnergizerTriggered = () => {
+      this.triggerEnergizer();
+      this.economyService.addCoins(5);
+      this.profileService.addXp(5);
+      this.achievementManager.increment('energizers_eaten', 1);
+      this.achievementManager.increment('dots_eaten', 1);
+    };
+
+    this.powerUpManager.onPelletEaten = () => {
+      this.economyService.addCoins(1);
+      this.profileService.addXp(1);
+      this.achievementManager.increment('dots_eaten', 1);
+      this.achievementManager.increment('waka_master', 1);
+      this.achievementManager.increment('single_run_dots', 1);
+    };
+
     this.applyTheme(this.themeManager.getTheme());
     this.applySkin(this.themeManager.getSkin());
 
@@ -169,19 +186,44 @@ export class Game {
   public tryEmergencyTeleport() {
     if (this.teleportCooldownTimer > 0) return;
 
-    // Busca posições livres no mapa
-    const freeTiles: { x: number; y: number }[] = [];
-    for (let r = 4; r < 32; r++) {
-      for (let c = 1; c < 27; c++) {
+    const pacCol = Math.floor(this.pacman.x / 8);
+    const pacRow = Math.floor(this.pacman.y / 8);
+
+    // Determina o quadrante oposto espelhado
+    // Colunas: 0 a 27 (centro = 14)
+    // Linhas: 3 a 33 (centro = 18)
+    const isLeft = pacCol < 14;
+    const isTop = pacRow < 18;
+
+    const targetMinCol = isLeft ? 14 : 1;
+    const targetMaxCol = isLeft ? 26 : 13;
+    const targetMinRow = isTop ? 18 : 4;
+    const targetMaxRow = isTop ? 31 : 17;
+
+    // Busca posições livres no quadrante oposto
+    let freeTiles: { x: number; y: number }[] = [];
+    for (let r = targetMinRow; r <= targetMaxRow; r++) {
+      for (let c = targetMinCol; c <= targetMaxCol; c++) {
         if (this.maze.isWalkableForPacman(c, r)) {
           freeTiles.push({ x: c, y: r });
         }
       }
     }
 
+    // Fallback: se não achar no quadrante oposto, busca no mapa inteiro
+    if (freeTiles.length === 0) {
+      for (let r = 4; r < 32; r++) {
+        for (let c = 1; c < 27; c++) {
+          if (this.maze.isWalkableForPacman(c, r)) {
+            freeTiles.push({ x: c, y: r });
+          }
+        }
+      }
+    }
+
     if (freeTiles.length === 0) return;
 
-    // Procura o tile mais distante de todos os 4 fantasmas
+    // Procura o tile no quadrante oposto mais distante dos 4 fantasmas
     let bestTile = freeTiles[0];
     let maxMinDist = -1;
 
@@ -314,6 +356,7 @@ export class Game {
     this.fruitManager.resetForLevel();
     this.powerUpManager.reset();
     this.deathsThisLevel = 0;
+    this.teleportCooldownTimer = 0; // Habilidade pronta imediatamente!
     this.applyLevelDifficulty();
     this.resetPositions();
     this.state = GameState.READY;
@@ -818,7 +861,18 @@ export class Game {
     this.powerUpManager.render(this.ctx);
 
     if (this.state !== GameState.PACMAN_DYING && this.state !== GameState.GAME_OVER) {
-      this.ghosts.forEach((ghost) => ghost.render(this.ctx));
+      const isSlowed = this.economyService.getGhostSlowdownMultiplier() < 1.0;
+      this.ghosts.forEach((ghost) => {
+        if (isSlowed) {
+          this.ctx.save();
+          this.ctx.shadowColor = '#c084fc';
+          this.ctx.shadowBlur = 6;
+          ghost.render(this.ctx);
+          this.ctx.restore();
+        } else {
+          ghost.render(this.ctx);
+        }
+      });
     }
 
     this.pacman.render(this.ctx);
@@ -833,7 +887,8 @@ export class Game {
       this.fruitManager,
       this.powerUpManager.getActiveState(),
       this.gameMode,
-      this.pelletManager.getRemainingCount()
+      this.pelletManager.getRemainingCount(),
+      this.teleportCooldownTimer
     );
 
     if (this.state === GameState.ATTRACT) {

@@ -12,6 +12,8 @@ import { SaveService } from './services/SaveService.ts';
 import { UpdaterUI } from './ui/UpdaterUI.ts';
 import { ProfileCard } from './ui/ProfileCard.ts';
 import { ChestModal } from './ui/ChestModal.ts';
+import { GhostGuideModal } from './ui/GhostGuideModal.ts';
+import { PowerUpModal } from './ui/PowerUpModal.ts';
 
 window.addEventListener('DOMContentLoaded', async () => {
   await SaveService.init();
@@ -29,6 +31,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const profileCard = new ProfileCard(game.profileService);
   new ChestModal(game.profileService, game.economyService, game.sound);
   const shopModal = new ShopModal(game.economyService, game.themeManager);
+  const ghostGuideModal = new GhostGuideModal();
+  const powerUpModal = new PowerUpModal(game.economyService);
+  powerUpModal.setSound(game.sound);
 
   shopModal.onSkinEquipped((skin) => {
     game.setPacmanSkin(skin);
@@ -52,6 +57,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btnOpenShop')?.addEventListener('click', () => shopModal.open());
   document.getElementById('btnOpenAchievements')?.addEventListener('click', () => achievementsModal.open());
   document.getElementById('btnOpenLeaderboard')?.addEventListener('click', () => leaderboardModal.open());
+  document.getElementById('cardGhostsGuide')?.addEventListener('click', () => ghostGuideModal.show());
+  document.getElementById('cardPowerUpsGuide')?.addEventListener('click', () => powerUpModal.show());
 
   // Callback de Game Over para inserção de iniciais
   game.onGameOverCallback = (score, level, mode) => {

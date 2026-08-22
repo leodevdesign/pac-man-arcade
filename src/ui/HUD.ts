@@ -81,7 +81,8 @@ export class HUD {
     fruitManager: FruitManager,
     powerUpState?: ActivePowerUpState,
     gameMode: GameMode = GameMode.CLASSIC,
-    pelletsRemaining?: number
+    pelletsRemaining?: number,
+    teleportCooldown?: number
   ) {
     ctx.save();
     ctx.font = 'bold 8px "Courier New", monospace';
@@ -187,6 +188,23 @@ export class HUD {
       ctx.arc(lifeX, lifeY, 5, 0.25 * Math.PI, 1.75 * Math.PI);
       ctx.lineTo(lifeX, lifeY);
       ctx.fill();
+    }
+
+    // 4.1 Indicador de Teleporte de Emergência no Centro Inferior
+    if (teleportCooldown !== undefined) {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (teleportCooldown <= 0) {
+        ctx.fillStyle = '#00E5FF';
+        ctx.font = 'bold 7px "Courier New", monospace';
+        ctx.fillText('🌀 ESPAÇO: PRONTO', 112, 34.5 * TILE_SIZE);
+      } else {
+        ctx.fillStyle = '#F59E0B';
+        ctx.font = 'bold 7px "Courier New", monospace';
+        ctx.fillText(`🌀 ESPAÇO: ${Math.ceil(teleportCooldown)}s`, 112, 34.5 * TILE_SIZE);
+      }
+      ctx.restore();
     }
 
     // 5. Frutas do Nível no Canto Inferior Direito
