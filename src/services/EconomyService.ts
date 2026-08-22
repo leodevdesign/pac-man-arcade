@@ -4,13 +4,14 @@ import { SaveService } from './SaveService.ts';
 export interface MultiLevelUpgrades {
   extraLives: number;          // 0 a 2 (Inicia com 3, 4 ou 5 vidas)
   boostedFruits: number;       // 0 a 5 (0%, +10%, +20%, +30%, +40%, +50%)
-  prolongedEnergizer: number;  // 0 a 20 (+0.25s por nível, até +5.0s)
+  prolongedEnergizer: number;  // 0 a 30 (+0.3s por nível, até +9.0s)
   superMagnet: number;         // 0 a 4 (Raio de 4 tiles base -> 5, 6, 7, 8 tiles)
   bombDuration: number;        // 0 a 4 (Duração de atordoamento: 1s, 2s, 3s, 4s)
   shieldCharges: number;       // 0 a 4 (Cargas de colisão absorvidas: 1, 2, 3, 4 defesas)
   freezeDuration: number;      // 0 a 5 (Tempo de congelamento: 1s, 2s, 3s, 4s, 5s)
   speedBoost: number;          // 0 a 15 (+1% por nível, até +15% de velocidade)
   coinMultiplier: number;      // 0 a 25 (+2% por nível, até +50% de moedas)
+  ghostJail: number;           // 0 a 12 (+0.25s por nível, até +3.0s de retenção)
 }
 
 export interface UpgradeDefinition {
@@ -56,6 +57,26 @@ export const UPGRADE_DEFINITIONS: UpgradeDefinition[] = [
     getEffectLabel: (lvl) => (lvl === 0 ? 'Moedas Padrão (0%)' : `+${lvl * 2}% de Moedas Bônus`),
   },
   {
+    key: 'prolongedEnergizer',
+    title: '⚡ Pílula Estendida',
+    desc: 'Aumenta o tempo em que os fantasmas ficam azuis e vulneráveis (+0.3s por nível, até +9.0s).',
+    icon: '⚡',
+    maxLevel: 30,
+    basePrice: 50,
+    priceStep: 20,
+    getEffectLabel: (lvl) => (lvl === 0 ? '6s Base' : `6s + ${(lvl * 0.3).toFixed(1)}s = ${(6 + lvl * 0.3).toFixed(1)}s Total`),
+  },
+  {
+    key: 'ghostJail',
+    title: '🔒 Prisão Espectral (Retenção)',
+    desc: 'Tempo que fantasmas devorados ficam retidos na casinha (+0.25s por nível, até +3.0s).',
+    icon: '🔒',
+    maxLevel: 12,
+    basePrice: 80,
+    priceStep: 35,
+    getEffectLabel: (lvl) => (lvl === 0 ? '3s Base Preso' : `3s + ${(lvl * 0.25).toFixed(2)}s = ${(3 + lvl * 0.25).toFixed(2)}s Preso`),
+  },
+  {
     key: 'boostedFruits',
     title: '🍒 Frutas Turbinadas',
     desc: 'Multiplicador de bônus de pontos ao devorar frutas.',
@@ -64,16 +85,6 @@ export const UPGRADE_DEFINITIONS: UpgradeDefinition[] = [
     basePrice: 150,
     priceStep: 150,
     getEffectLabel: (lvl) => (lvl === 0 ? 'Pontuação Padrão (0%)' : `+${lvl * 10}% de Pontos em Frutas`),
-  },
-  {
-    key: 'prolongedEnergizer',
-    title: '⚡ Pílula Estendida',
-    desc: 'Aumenta o tempo em que os fantasmas ficam azuis e vulneráveis (+0.25s/nível).',
-    icon: '⚡',
-    maxLevel: 20,
-    basePrice: 60,
-    priceStep: 25,
-    getEffectLabel: (lvl) => (lvl === 0 ? 'Duração Padrão' : `+${(lvl * 0.25).toFixed(2)}s de Tempo Azul`),
   },
   {
     key: 'superMagnet',
@@ -198,6 +209,7 @@ export class EconomyService {
     freezeDuration: 0,
     speedBoost: 0,
     coinMultiplier: 0,
+    ghostJail: 0,
   };
 
   private onCoinsChangedCallbacks: ((coins: number) => void)[] = [];
@@ -296,7 +308,11 @@ export class EconomyService {
   }
 
   public getEnergizerExtraSeconds(): number {
-    return this.upgrades.prolongedEnergizer * 0.25;
+    return this.upgrades.prolongedEnergizer * 0.3;
+  }
+
+  public getGhostJailDurationMs(): number {
+    return 3000 + (this.upgrades.ghostJail * 250);
   }
 
   public getMagnetRadius(): number {

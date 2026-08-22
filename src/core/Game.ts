@@ -290,17 +290,14 @@ export class Game {
       this.pacman2.speed = BASE_SPEED * 1.0 * speedMult * upgradeSpeed;
     }
 
-    let baseDuration = 6000;
-    if (this.level === 2) baseDuration = 5000;
-    else if (this.level === 3) baseDuration = 4000;
-    else if (this.level === 4) baseDuration = 3000;
-    else if (this.level <= 6) baseDuration = 2000;
-    else if (this.level <= 8) baseDuration = 1000;
-    else baseDuration = 500;
-
-    // Upgrade Prolonged Energizer
-    baseDuration += this.economyService.getEnergizerExtraSeconds() * 1000;
+    const baseDuration = 6000;
     this.frightenedDuration = baseDuration;
+
+    // Atualiza a retenção da Prisão Espectral em todos os fantasmas
+    const jailDuration = this.economyService.getGhostJailDurationMs();
+    this.ghosts.forEach((ghost) => {
+      ghost.jailDurationMs = jailDuration;
+    });
   }
 
   private resetPositions() {

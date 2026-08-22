@@ -29,6 +29,7 @@ export abstract class Ghost extends Entity {
   // Estados dos Power-ups
   public stunTimer: number = 0;
   public freezeTimer: number = 0;
+  public jailDurationMs: number = 3000;
 
   // Customização de Tema Visual
   public customColor?: string;
@@ -138,9 +139,15 @@ export abstract class Ghost extends Entity {
     if (this.mode === GhostMode.EATEN) {
       const exitPxX = GHOST_HOUSE_EXIT_TILE.x * TILE_SIZE;
       const exitPxY = GHOST_HOUSE_EXIT_TILE.y * TILE_SIZE + TILE_SIZE / 2;
-      if (Math.hypot(this.x - exitPxX, this.y - exitPxY) < 4) {
-        this.mode = this.previousMode === GhostMode.FRIGHTENED ? GhostMode.CHASE : this.previousMode;
+      if (Math.hypot(this.x - exitPxX, this.y - exitPxY) < 6) {
+        this.inHouse = true;
+        this.mode = GhostMode.IN_HOUSE;
+        this.x = 13.5 * TILE_SIZE;
+        this.y = 17 * TILE_SIZE;
+        this.houseExitTimer = this.jailDurationMs;
+        this.previousMode = GhostMode.CHASE;
         this.direction = DIRECTION.UP;
+        this.lastDecidedTile = '';
       }
     }
 

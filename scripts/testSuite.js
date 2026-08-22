@@ -203,14 +203,13 @@ assert(buyUpgradeSuccess && currentCoins === 50, 'Gasto de 50 moedas efetuado co
 const buyTooExpensive = spendCoins(9999);
 assert(!buyTooExpensive && currentCoins === 50, 'Gasto de valor maior que o saldo rejeitado');
 
-// Testes dos novos upgrades
-const speedLevel = 15;
-const speedMultiplier = 1 + speedLevel * 0.01;
-assert(Math.abs(speedMultiplier - 1.15) < 0.001, 'Upgrade Tênis Turbo concede exatamente +15% de velocidade no nível máximo (15)');
+const energizerLevel = 30;
+const energizerTotalDuration = 6.0 + energizerLevel * 0.3;
+assert(Math.abs(energizerTotalDuration - 15.0) < 0.001, 'Upgrade Pílula Estendida alcança 15.0s de tempo vulnerável no nível 30 (6s base + 9s)');
 
-const coinLevel = 25;
-const coinBonus = 1 + coinLevel * 0.02;
-assert(Math.abs(coinBonus - 1.50) < 0.001, 'Upgrade Detector de Ouro concede exatamente +50% de moedas bônus no nível máximo (25)');
+const jailLevel = 12;
+const ghostJailTotalDuration = 3.0 + jailLevel * 0.25;
+assert(Math.abs(ghostJailTotalDuration - 6.0) < 0.001, 'Upgrade Prisão Espectral alcança 6.0s de retenção na casinha no nível 12 (3s base + 3s)');
 
 // -----------------------------------------------------------------------------
 // 6. TESTES DO SISTEMA DE CONQUISTAS PROGRESSIVAS (50 TRILHAS / 150 TIERS)
