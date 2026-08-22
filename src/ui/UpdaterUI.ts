@@ -34,8 +34,14 @@ export class UpdaterUI {
 
   constructor() {
     this.createBannerElement();
-    // Inicia verificação silenciosa após 2.5 segundos de inicialização
+    // Inicia verificação silenciosa inicial após 2.5 segundos
     setTimeout(() => this.checkUpdates(), 2500);
+    // Checagem contínua em tempo real a cada 45 segundos (em segundo plano)
+    setInterval(() => {
+      if (!this.isDownloading) {
+        this.checkUpdates();
+      }
+    }, 45000);
   }
 
   private createBannerElement() {
