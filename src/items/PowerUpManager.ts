@@ -56,11 +56,13 @@ export class PowerUpManager {
   public onEnergizerTriggered: (() => void) | null = null;
   public onPelletEaten: ((points: number) => void) | null = null;
 
+  private spawnTile: { x: number; y: number } = { x: 13.5, y: 20 };
+
   constructor() {
     this.reset();
   }
 
-  public reset() {
+  public reset(customSpawn?: { x: number; y: number }) {
     this.activeItem = null;
     this.spawnCooldown = 20000;
     this.hasShield = false;
@@ -68,6 +70,11 @@ export class PowerUpManager {
     this.magnetTimer = 0;
     this.freezeTimer = 0;
     this.shockwave.active = false;
+    if (customSpawn) {
+      this.spawnTile = customSpawn;
+    } else {
+      this.spawnTile = { x: 13.5, y: 20 };
+    }
   }
 
   public getActiveState(): ActivePowerUpState {
@@ -104,27 +111,27 @@ export class PowerUpManager {
 
       if (this.activeItem.timer <= 0) {
         this.activeItem = null;
-        this.spawnCooldown = 22000 + Math.random() * 8000;
+        this.spawnCooldown = 20000 + Math.random() * 10000;
       }
     }
 
-    // 2. Atualização dos Power-ups Ativos
-    if (this.magnetTimer > 0) {
-      this.magnetTimer -= dt;
-      const radius = economyService ? economyService.getMagnetRadius() : 5;
-      this.processMagnetPull(pacmanX, pacmanY, pelletManager, hud, sound, radius);
-    }
-
-    if (this.freezeTimer > 0) {
-      this.freezeTimer -= dt;
-    }
-
-    // 3. Atualização da Onda de Choque (Bomba)
+    // 2. Animação de Onda de Choque (Bomba)
     if (this.shockwave.active) {
-      this.shockwave.radius += 3.5;
+      this.shockwave.radius += dt * 0.15;
       if (this.shockwave.radius >= this.shockwave.maxRadius) {
         this.shockwave.active = false;
       }
+    }
+
+    // 3. Atualização de Timers dos Efeitos
+    if (this.magnetTimer > 0) {
+      this.magnetTimer = Math.max(0, this.magnetTimer - dt);
+      const magnetRadius = economyService ? economyService.getMagnetRadius() : 5;
+      this.processMagnetPull(pacmanX, pacmanY, pelletManager, hud, sound, magnetRadius);
+    }
+
+    if (this.freezeTimer > 0) {
+      this.freezeTimer = Math.max(0, this.freezeTimer - dt);
     }
   }
 
@@ -138,11 +145,11 @@ export class PowerUpManager {
     const pickedType = types[Math.floor(Math.random() * types.length)];
     const config = POWER_UP_CONFIGS[pickedType];
 
-    // Posição no corredor central (linha 20, col 13.5)
+    // Posição no corredor central configurado para este mapa
     this.activeItem = {
       config,
-      x: 13.5 * TILE_SIZE,
-      y: 20 * TILE_SIZE + TILE_SIZE / 2,
+      x: this.spawnTile.x * TILE_SIZE,
+      y: this.spawnTile.y * TILE_SIZE + TILE_SIZE / 2,
       timer: 12000, // 12 segundos para coletar
     };
   }

@@ -169,9 +169,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   const customMapSelect = new CustomSelect('mapSelect', (val) => {
-    const preset = MAP_PRESETS.find((p) => p.id === val);
-    if (preset) {
-      game.loadMap(preset);
+    if (val === 'random_rotation') {
+      game.setRandomMazeMode(true);
+    } else {
+      const preset = MAP_PRESETS.find((p) => p.id === val);
+      if (preset) {
+        game.loadMap(preset, false);
+      }
     }
   });
 

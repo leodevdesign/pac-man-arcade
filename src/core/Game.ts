@@ -83,18 +83,29 @@ export class Game {
   // Callbacks
   public onGameOverCallback: ((score: number, level: number, mode: string) => void) | null = null;
 
+  // Render Scale HD
+  private renderScale: number = 3;
+
+  // Labirintos Aleatórios
+  private isRandomMazeMode: boolean = true;
+  private randomizedPool: MapConfig[] = [];
+  private poolIndex: number = 0;
+
   // FPS tracking
   private lastFrameTime: number = 0;
   private fps: number = 60;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.canvas.width = INTERNAL_WIDTH;
-    this.canvas.height = INTERNAL_HEIGHT;
+    const dpr = Math.max(2, Math.min(4, Math.round(window.devicePixelRatio || 2)));
+    this.renderScale = dpr * 2; // Buffer HD 4x / 6x
+    this.canvas.width = INTERNAL_WIDTH * this.renderScale;
+    this.canvas.height = INTERNAL_HEIGHT * this.renderScale;
     const context = canvas.getContext('2d', { alpha: false });
     if (!context) throw new Error('Não foi possível obter o contexto 2D do Canvas');
     this.ctx = context;
-    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = 'high';
 
     this.themeManager = new ThemeManager();
     this.economyService = new EconomyService();
@@ -102,6 +113,7 @@ export class Game {
     this.achievementManager = new AchievementManager();
     this.leaderboardService = new LeaderboardService();
 
+    this.initRandomPool();
     this.currentMapConfig = MAP_PRESETS[0];
     this.maze = new Maze(this.currentMapConfig);
     this.pelletManager = new PelletManager();
@@ -311,11 +323,51 @@ export class Game {
     this.startNewGame();
   }
 
-  public loadMap(config: MapConfig) {
+  private initRandomPool() {
+    // Pega todos os mapas exceto o clássico 1980
+    const otherMaps = MAP_PRESETS.slice(1);
+    const pool = [...otherMaps];
+    // Fisher-Yates shuffle
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    this.randomizedPool = pool;
+    this.poolIndex = 0;
+  }
+
+  private pickNextMapForLevel() {
+    if (!this.isRandomMazeMode) {
+      this.checkMsPacmanMapProgression();
+      return;
+    }
+
+    if (this.level === 1) {
+      // Fase 1 SEMPRE o labirinto clássico azul de 1980
+      const classicMap = MAP_PRESETS[0];
+      this.currentMapConfig = classicMap;
+      this.maze.loadConfig(classicMap);
+      this.applyTheme(this.themeManager.getTheme());
+    } else {
+      // Fase 2 em diante: sorteia do pool de 10+ mapas
+      if (this.randomizedPool.length === 0 || this.poolIndex >= this.randomizedPool.length) {
+        this.initRandomPool();
+      }
+      const nextMap = this.randomizedPool[this.poolIndex];
+      this.poolIndex++;
+      this.currentMapConfig = nextMap;
+      this.maze.loadConfig(nextMap);
+      this.applyTheme(this.themeManager.getTheme());
+    }
+  }
+
+  public loadMap(config: MapConfig, isRandomMode: boolean = false) {
+    this.isRandomMazeMode = isRandomMode;
     this.currentMapConfig = config;
     this.maze.loadConfig(config);
     this.applyTheme(this.themeManager.getTheme());
     this.level = 1;
+    this.initRandomPool();
     const initialLives = this.economyService.getStartingLives();
     this.pacman.lives = initialLives;
     this.pacman2.lives = initialLives;
@@ -324,8 +376,14 @@ export class Game {
     this.startLevel();
   }
 
+  public setRandomMazeMode(enable: boolean) {
+    this.isRandomMazeMode = enable;
+    this.startNewGame();
+  }
+
   public startNewGame() {
     this.level = 1;
+    this.initRandomPool();
     const initialLives = this.economyService.getStartingLives();
     this.pacman.lives = initialLives;
     this.pacman2.lives = initialLives;
@@ -351,10 +409,10 @@ export class Game {
   }
 
   private startLevel() {
-    this.checkMsPacmanMapProgression();
+    this.pickNextMapForLevel();
     this.pelletManager.reset(this.maze.getRawMap());
-    this.fruitManager.resetForLevel();
-    this.powerUpManager.reset();
+    this.fruitManager.resetForLevel(this.currentMapConfig.fruitSpawn);
+    this.powerUpManager.reset(this.currentMapConfig.powerUpSpawn || this.currentMapConfig.fruitSpawn);
     this.deathsThisLevel = 0;
     this.teleportCooldownTimer = 0; // Habilidade pronta imediatamente!
     this.applyLevelDifficulty();
@@ -403,10 +461,11 @@ export class Game {
   }
 
   private resetPositions() {
-    this.pacman.resetPosition();
-    this.pacman2.resetPosition({ x: 14.5, y: 26 });
+    const spawn = this.currentMapConfig.pacmanSpawn || { x: 13.5, y: 26 };
+    this.pacman.resetPosition(spawn);
+    this.pacman2.resetPosition({ x: spawn.x + 1, y: spawn.y });
     this.input.reset();
-    this.powerUpManager.reset();
+    this.powerUpManager.reset(this.currentMapConfig.powerUpSpawn || this.currentMapConfig.fruitSpawn);
 
     let pinkyDelay = 1000;
     let inkyDelay = 3000;
@@ -627,6 +686,12 @@ export class Game {
       this.handlePelletEating(this.pacman2, true, scoreMult, masteryMult);
     }
 
+    // 4.1 Checagem Universal de Conclusão de Fase (Física ou via Ímã de pastilhas)
+    if (this.pelletManager.getRemainingCount() === 0 && this.state === GameState.PLAYING) {
+      this.triggerLevelClear();
+      return;
+    }
+
     // 5. Checagem de Fruta (Pomar Fértil & Ímã de Frutas)
     this.fruitManager.checkPelletSpawns(
       this.pelletManager.getEatenCount(),
@@ -678,6 +743,21 @@ export class Game {
     this.checkGhostCollisions(masteryMult);
   }
 
+  private triggerLevelClear() {
+    if (this.state === GameState.LEVEL_CLEAR) return;
+    this.state = GameState.LEVEL_CLEAR;
+    this.stateTimer = 2200;
+    this.sound.stopSiren();
+    this.achievementManager.increment('level_clears', 1);
+    this.achievementManager.recordMax('level_progression', this.level + 1);
+
+    if (this.gameMode === GameMode.COOP_2P) {
+      this.achievementManager.increment('coop_levels_cleared', 1);
+    } else if (this.gameMode === GameMode.TURBO) {
+      this.achievementManager.increment('turbo_stages_survived', 1);
+    }
+  }
+
   private handlePelletEating(pac: Pacman, isP2: boolean, scoreMult: number, masteryMult: number = 1.0) {
     const eatResult = this.pelletManager.eatPellet(pac.tileX, pac.tileY);
     if (eatResult.isPellet) {
@@ -718,17 +798,7 @@ export class Game {
       this.fruitManager.checkPelletSpawns(this.pelletManager.getEatenCount(), this.level);
 
       if (this.pelletManager.getRemainingCount() === 0) {
-        this.state = GameState.LEVEL_CLEAR;
-        this.stateTimer = 2200;
-        this.sound.stopSiren();
-        this.achievementManager.increment('level_clears', 1);
-        this.achievementManager.recordMax('level_progression', this.level + 1);
-
-        if (this.gameMode === GameMode.COOP_2P) {
-          this.achievementManager.increment('coop_levels_cleared', 1);
-        } else if (this.gameMode === GameMode.TURBO) {
-          this.achievementManager.increment('turbo_stages_survived', 1);
-        }
+        this.triggerLevelClear();
       }
     }
   }
@@ -846,6 +916,9 @@ export class Game {
   }
 
   private render() {
+    this.ctx.save();
+    this.ctx.scale(this.renderScale, this.renderScale);
+
     this.ctx.fillStyle = this.maze.bgColor;
     this.ctx.fillRect(0, 0, INTERNAL_WIDTH, INTERNAL_HEIGHT);
 
@@ -905,7 +978,7 @@ export class Game {
           INTERNAL_WIDTH / 2,
           20 * 8,
           '#FFFF00',
-          'bold 10px monospace'
+          'bold 11px "Chakra Petch", "Segoe UI", Arial, sans-serif'
         );
         this.ctx.restore();
       } else if (this.state === GameState.GAME_OVER) {
@@ -917,8 +990,8 @@ export class Game {
           overText,
           INTERNAL_WIDTH / 2,
           20 * 8,
-          '#FF0000',
-          'bold 10px monospace'
+          '#FF3333',
+          'bold 12px "Chakra Petch", "Segoe UI", Arial, sans-serif'
         );
         ctxFormatText(
           this.ctx,
@@ -926,7 +999,7 @@ export class Game {
           INTERNAL_WIDTH / 2,
           23 * 8,
           '#FFFFFF',
-          '8px monospace'
+          'bold 8.5px "Chakra Petch", "Segoe UI", Arial, sans-serif'
         );
         this.ctx.restore();
       }
@@ -934,7 +1007,7 @@ export class Game {
 
     if (this.isGamePaused) {
       this.ctx.save();
-      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
       this.ctx.fillRect(0, 0, INTERNAL_WIDTH, INTERNAL_HEIGHT);
       ctxFormatText(
         this.ctx,
@@ -942,7 +1015,7 @@ export class Game {
         INTERNAL_WIDTH / 2,
         INTERNAL_HEIGHT / 2,
         '#FFFF00',
-        'bold 12px monospace'
+        'bold 13px "Chakra Petch", "Segoe UI", Arial, sans-serif'
       );
       this.ctx.restore();
     }
@@ -956,6 +1029,8 @@ export class Game {
         this.fps
       );
     }
+
+    this.ctx.restore();
   }
 
   private renderAttractScreen() {

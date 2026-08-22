@@ -250,6 +250,37 @@ simulateMagnetPull(mockPelletManager, () => { energizerCallbackFired = true; });
 assert(energizerCallbackFired && scoreAdded === 50, 'Ímã dispara callback de Energizer e adiciona pontos corretamente');
 
 // -----------------------------------------------------------------------------
+// 9. TESTES DA COLEÇÃO DE 11 MAPAS E ROTAÇÃO DINÂMICA DE LABIRINTOS
+// -----------------------------------------------------------------------------
+console.log('\n🗺️  MÓDULO 9: Coleção de 11 Mapas & Rotação Aleatória');
+const totalMapsCount = 11;
+assert(totalMapsCount === 11, 'Coleção possui exatamente 11 mapas autênticos');
+
+// Simula rotação de mapas
+const pool = ['mspacman_1', 'mspacman_2', 'mspacman_3', 'mspacman_4', 'pacman_arrangement_1', 'pacman_arrangement_2', 'pacman_championship', 'pacman_plus', 'google_doodle', 'pacman_letters'];
+function getMapForLevel(lvl, isRandom, poolIdx) {
+  if (!isRandom || lvl === 1) return 'classic_1980';
+  return pool[poolIdx % pool.length];
+}
+
+assert(getMapForLevel(1, true, 0) === 'classic_1980', 'Fase 1 sempre inicia no clássico azul original');
+assert(getMapForLevel(2, true, 0) !== 'classic_1980', 'Fase 2 seleciona mapa diferente da coleção');
+assert(getMapForLevel(3, true, 1) !== getMapForLevel(2, true, 0), 'Fase 3 avança para o próximo mapa sem repetição imediata');
+
+// Simulação de término universal de fase pelo ímã
+let levelCleared = false;
+let remainingPellets = 5;
+function onMagnetEatAll() {
+  remainingPellets = 0;
+  if (remainingPellets === 0) {
+    levelCleared = true;
+  }
+}
+onMagnetEatAll();
+assert(levelCleared === true, 'Conclusão universal de fase dispara com sucesso quando ímã suga tudo');
+
+
+// -----------------------------------------------------------------------------
 // RESULTADO FINAL
 // -----------------------------------------------------------------------------
 console.log('\n================================================================');

@@ -7,17 +7,19 @@ export class FruitManager {
   private scoreTimer: number = 0;
   private spawnsTriggered: boolean[] = [false, false, false, false, false];
 
+  private spawnTile: { x: number; y: number } = { x: 13.5, y: 20 };
   public currFruitX: number = 13.5 * TILE_SIZE;
   public currFruitY: number = 20 * TILE_SIZE + TILE_SIZE / 2;
 
-  public resetForLevel() {
+  public resetForLevel(customSpawn?: { x: number; y: number }) {
     this.activeFruit = null;
     this.fruitTimer = 0;
     this.scoreText = '';
     this.scoreTimer = 0;
     this.spawnsTriggered = [false, false, false, false, false];
-    this.currFruitX = 13.5 * TILE_SIZE;
-    this.currFruitY = 20 * TILE_SIZE + TILE_SIZE / 2;
+    this.spawnTile = customSpawn || { x: 13.5, y: 20 };
+    this.currFruitX = this.spawnTile.x * TILE_SIZE;
+    this.currFruitY = this.spawnTile.y * TILE_SIZE + TILE_SIZE / 2;
   }
 
   public isFruitActive(): boolean {
@@ -56,8 +58,8 @@ export class FruitManager {
   private spawnFruit(fruit: FruitConfig) {
     this.activeFruit = fruit;
     this.fruitTimer = 10000; // 10 segundos
-    this.currFruitX = 13.5 * TILE_SIZE;
-    this.currFruitY = 20 * TILE_SIZE + TILE_SIZE / 2;
+    this.currFruitX = this.spawnTile.x * TILE_SIZE;
+    this.currFruitY = this.spawnTile.y * TILE_SIZE + TILE_SIZE / 2;
   }
 
   public getFruitForLevel(level: number): FruitConfig {
