@@ -85,7 +85,7 @@ export class HUD {
     teleportCooldown?: number
   ) {
     ctx.save();
-    ctx.font = 'bold 8px "Courier New", monospace';
+    ctx.font = 'bold 8.5px "Chakra Petch", "Segoe UI", Arial, sans-serif';
     ctx.textBaseline = 'top';
 
     // 1. Placar Superior (Linhas 0-2)
@@ -93,7 +93,7 @@ export class HUD {
     ctx.textAlign = 'left';
 
     if (gameMode === GameMode.GHOST_HUNTER) {
-      ctx.fillStyle = '#FF0000';
+      ctx.fillStyle = '#FF4D4D';
       ctx.fillText('👻 HUNTER', 8, 4);
       ctx.fillStyle = '#FFFFFF';
       ctx.fillText('HIGH SCORE', 120, 4);
@@ -109,7 +109,7 @@ export class HUD {
       if (pelletsRemaining !== undefined) {
         ctx.textAlign = 'center';
         ctx.fillStyle = '#FFFF00';
-        ctx.font = '7px monospace';
+        ctx.font = 'bold 7.5px "Chakra Petch", "Segoe UI", sans-serif';
         ctx.fillText(`DOTS: ${pelletsRemaining}`, 112, 14);
       }
     } else if (gameMode === GameMode.COOP_2P || gameMode === GameMode.VERSUS_2P) {
@@ -136,7 +136,7 @@ export class HUD {
       if (gameMode === GameMode.TURBO) {
         ctx.textAlign = 'center';
         ctx.fillStyle = '#FF3D00';
-        ctx.font = 'bold 7px monospace';
+        ctx.font = 'bold 7.5px "Chakra Petch", "Segoe UI", sans-serif';
         ctx.fillText('⚡2X TURBO', 112, 4);
       }
     }
@@ -156,7 +156,7 @@ export class HUD {
         const secs = (powerUpState.magnetTimer / 1000).toFixed(1);
         ctx.fillStyle = '#00E5FF';
         ctx.textAlign = 'left';
-        ctx.font = '6.5px "Courier New", monospace';
+        ctx.font = 'bold 7px "Chakra Petch", "Segoe UI", sans-serif';
         ctx.fillText(`🧲${secs}s`, badgeX, 13);
         badgeX += 34;
       }
@@ -165,7 +165,7 @@ export class HUD {
         const secs = (powerUpState.freezeTimer / 1000).toFixed(1);
         ctx.fillStyle = '#2979FF';
         ctx.textAlign = 'left';
-        ctx.font = '6.5px "Courier New", monospace';
+        ctx.font = 'bold 7px "Chakra Petch", "Segoe UI", sans-serif';
         ctx.fillText(`⏳${secs}s`, badgeX, 13);
       }
     }
@@ -175,7 +175,7 @@ export class HUD {
       ctx.fillStyle = '#00FFFF';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font = 'bold 8px "Courier New", monospace';
+      ctx.font = 'bold 8.5px "Chakra Petch", "Segoe UI", sans-serif';
       ctx.fillText(this.ghostEatScore.text, this.ghostEatScore.x, this.ghostEatScore.y);
     }
 
@@ -197,11 +197,11 @@ export class HUD {
       ctx.textBaseline = 'middle';
       if (teleportCooldown <= 0) {
         ctx.fillStyle = '#00E5FF';
-        ctx.font = 'bold 7px "Courier New", monospace';
+        ctx.font = 'bold 8px "Chakra Petch", "Segoe UI", sans-serif';
         ctx.fillText('🌀 ESPAÇO: PRONTO', 112, 34.5 * TILE_SIZE);
       } else {
         ctx.fillStyle = '#F59E0B';
-        ctx.font = 'bold 7px "Courier New", monospace';
+        ctx.font = 'bold 8px "Chakra Petch", "Segoe UI", sans-serif';
         ctx.fillText(`🌀 ESPAÇO: ${Math.ceil(teleportCooldown)}s`, 112, 34.5 * TILE_SIZE);
       }
       ctx.restore();

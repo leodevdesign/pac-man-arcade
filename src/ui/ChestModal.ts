@@ -30,27 +30,18 @@ export class ChestModal {
   }
 
   private bindEvents() {
-    this.profileService.onLevelUp((newLevel, rewardCoins) => {
-      this.openForLevelUp(newLevel, rewardCoins);
-    });
-
+    // Não abre mais o modal durante a jogatina: apenas armazena os baús silenciosamente!
     document.getElementById('btnOpenChestReward')?.addEventListener('click', () => {
       this.openManual();
     });
   }
 
-  public openForLevelUp(newLevel: number, _rewardCoins: number) {
-    this.renderChestView(`🎉 SUBIU PARA O NÍVEL ${newLevel}!`, `Você conquistou um Baú do Tesouro Arcade! Clique para abrir:`, true);
-    this.modalEl?.classList.remove('hidden');
-    this.modalEl?.classList.add('open');
-  }
-
   public openManual() {
     const data = this.profileService.getProfileData();
     if (data.unclaimedChests > 0) {
-      this.renderChestView(`🎁 BAÚ DO TESOURO DISPONÍVEL!`, `Você tem ${data.unclaimedChests} baú(s) para abrir. Clique no baú para resgatar sua recompensa:`, true);
+      this.renderChestView(`🎁 BAÚ DO TESOURO DISPONÍVEL!`, `Você tem ${data.unclaimedChests} baú(s) para abrir. Clique no baú ou resgate todos de uma vez:`, true, data.unclaimedChests);
     } else {
-      this.renderChestView(`🎁 BAÚS DO TESOURO ARCADE`, `Você está no Nível ${data.level}. Continue jogando e suba de nível para resgatar baús repletos de moedas e temas exclusivos!`, false);
+      this.renderChestView(`🎁 BAÚS DO TESOURO ARCADE`, `Você está no Nível ${data.level}. Continue jogando e suba de nível para resgatar baús repletos de moedas e temas exclusivos!`, false, 0);
     }
     this.modalEl?.classList.remove('hidden');
     this.modalEl?.classList.add('open');
@@ -61,7 +52,7 @@ export class ChestModal {
     this.modalEl?.classList.add('hidden');
   }
 
-  private renderChestView(title: string, subtitle: string, canOpen: boolean) {
+  private renderChestView(title: string, subtitle: string, canOpen: boolean, chestCount: number) {
     if (!this.modalEl) return;
     this.isChestOpened = false;
 
@@ -77,8 +68,17 @@ export class ChestModal {
           <div class="interactive-chest-container ${canOpen ? 'pulse-hover' : ''}" id="interactiveChest">
             <div class="chest-icon-glow"></div>
             <div class="chest-pixel-art" id="chestIcon">${canOpen ? '🎁' : '🔒📦'}</div>
-            <div class="chest-tap-hint" id="chestTapHint">${canOpen ? '👆 CLIQUE PARA ABRIR!' : '✨ Ganhe baús ao subir de nível!'}</div>
+            <div class="chest-tap-hint" id="chestTapHint">${canOpen ? (chestCount > 1 ? `👆 CLIQUE PARA ABRIR (OU VEJA ABAIXO)` : '👆 CLIQUE PARA ABRIR!') : '✨ Ganhe baús ao subir de nível!'}</div>
           </div>
+
+          ${canOpen && chestCount > 1 ? `
+            <div style="margin-top: 14px; text-align: center;">
+              <button class="btn-primary btn-shop-highlight" id="btnClaimAllChests" style="padding: 10px 18px; font-size: 14px; width: 100%;">
+                ⚡ ABRIR TODOS OS ${chestCount} BAÚS DE UMA VEZ
+              </button>
+            </div>
+          ` : ''}
+
           <div class="chest-reward-area hidden" id="chestRewardArea"></div>
         </div>
       </div>
@@ -87,6 +87,7 @@ export class ChestModal {
     document.getElementById('btnCloseChest')?.addEventListener('click', () => this.close());
     if (canOpen) {
       document.getElementById('interactiveChest')?.addEventListener('click', () => this.triggerOpenChest());
+      document.getElementById('btnClaimAllChests')?.addEventListener('click', () => this.triggerOpenAllChests());
     }
   }
 
@@ -97,6 +98,8 @@ export class ChestModal {
     const chestIcon = document.getElementById('chestIcon');
     const tapHint = document.getElementById('chestTapHint');
     const rewardArea = document.getElementById('chestRewardArea');
+    const btnClaimAll = document.getElementById('btnClaimAllChests');
+    if (btnClaimAll) btnClaimAll.remove();
 
     if (chestIcon) {
       chestIcon.innerText = '✨📦🔓✨';
@@ -118,7 +121,7 @@ export class ChestModal {
             <div class="reward-coins-val">+${claimResult.coins.toLocaleString()} 🪙 MOEDAS!</div>
             ${claimResult.newThemeUnlocked ? `<div class="reward-unlock-tag">🔓 NOVO DESBLOQUEIO: <strong>${claimResult.newThemeUnlocked}</strong></div>` : ''}
             <button class="btn-primary btn-claim-action" id="btnClaimAndClose">
-              ${this.profileService.getUnclaimedChests() > 0 ? '🎁 ABRIR PRÓXIMO BAÚ' : '✨ COLETAR E CONTINUAR'}
+              ${this.profileService.getUnclaimedChests() > 0 ? `🎁 ABRIR PRÓXIMO BAÚ (${this.profileService.getUnclaimedChests()} restantes)` : '✨ COLETAR E CONTINUAR'}
             </button>
           </div>
         `;
@@ -130,6 +133,53 @@ export class ChestModal {
           } else {
             this.close();
           }
+        });
+      }
+    }, 600);
+  }
+
+  private triggerOpenAllChests() {
+    if (this.isChestOpened) return;
+    this.isChestOpened = true;
+
+    const chestIcon = document.getElementById('chestIcon');
+    const tapHint = document.getElementById('chestTapHint');
+    const rewardArea = document.getElementById('chestRewardArea');
+    const btnClaimAll = document.getElementById('btnClaimAllChests');
+    if (btnClaimAll) btnClaimAll.remove();
+
+    if (chestIcon) {
+      chestIcon.innerText = '🎆👑📦💎✨';
+      chestIcon.classList.add('chest-burst-anim');
+    }
+    if (tapHint) tapHint.remove();
+
+    this.sound.playEatFruit();
+    this.sound.playExtraLife();
+    this.launchConfettiEffect();
+    this.launchConfettiEffect();
+
+    const res = this.profileService.claimAllChests();
+    this.economyService.addCoins(res.totalCoins);
+
+    setTimeout(() => {
+      if (rewardArea) {
+        rewardArea.innerHTML = `
+          <div class="reward-box-reveal">
+            <div style="font-size: 13px; color: #ffd700; font-weight: bold; margin-bottom: 4px;">🎉 TODOS OS ${res.count} BAÚS FORAM ABERTOS!</div>
+            <div class="reward-coins-val" style="font-size: 26px;">+${res.totalCoins.toLocaleString()} 🪙 MOEDAS!</div>
+            ${res.unlockedThemes.length > 0 ? `
+              <div class="reward-unlock-tag">🔓 ${res.unlockedThemes.length} NOVO(S) DESBLOQUEIO(S):<br><strong>${res.unlockedThemes.join(', ')}</strong></div>
+            ` : ''}
+            <button class="btn-primary btn-claim-action" id="btnClaimAndClose">
+              ✨ COLETAR E CONTINUAR
+            </button>
+          </div>
+        `;
+        rewardArea.classList.remove('hidden');
+
+        document.getElementById('btnClaimAndClose')?.addEventListener('click', () => {
+          this.close();
         });
       }
     }, 600);

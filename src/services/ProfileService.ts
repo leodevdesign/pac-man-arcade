@@ -155,6 +155,23 @@ export class ProfileService {
     return { coins, newThemeUnlocked };
   }
 
+  public claimAllChests(): { totalCoins: number; count: number; unlockedThemes: string[] } {
+    if (this.unclaimedChests <= 0) return { totalCoins: 0, count: 0, unlockedThemes: [] };
+    const count = this.unclaimedChests;
+    let totalCoins = 0;
+    const unlockedThemes: string[] = [];
+
+    while (this.unclaimedChests > 0) {
+      const res = this.claimChest();
+      totalCoins += res.coins;
+      if (res.newThemeUnlocked) {
+        unlockedThemes.push(res.newThemeUnlocked);
+      }
+    }
+
+    return { totalCoins, count, unlockedThemes };
+  }
+
   private saveToStorage() {
     const payload = {
       xp: this.xp,

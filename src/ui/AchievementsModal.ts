@@ -91,10 +91,13 @@ export class AchievementsModal {
 
     const progressPercent = Math.min(100, Math.round((ach.currentValue / activeTier.target) * 100));
 
-    // 5 Badges de Estrelas / Diamantes
-    const tierIcons = ['⭐', '⭐⭐', '⭐⭐⭐', '💎', '👑'];
+    // 5 Badges de Tiers: 3 Estrelas (Bronze, Prata, Ouro) + Diamante (Platina) + Coroa (Mítico)
+    const tierIcons = ['⭐', '⭐', '⭐', '💎', '👑'];
+    const tierLabels = ['Bronze', 'Prata', 'Ouro', 'Platina', 'Mítico'];
+    const tierClasses = ['tier-bronze', 'tier-silver', 'tier-gold', 'tier-plat', 'tier-mythic'];
+
     const starBadges = ach.tiers.map((t, idx) => `
-      <span class="ach-tier-badge ${t.unlocked ? 'unlocked' : 'locked'}" title="${t.name}">
+      <span class="ach-tier-badge ${tierClasses[idx]} ${t.unlocked ? 'unlocked' : 'locked'}" title="${t.name} (${tierLabels[idx]})">
         ${tierIcons[idx]}
       </span>
     `).join('');
@@ -105,11 +108,15 @@ export class AchievementsModal {
         <div class="ach-card-icon-title">
           <span class="ach-card-emoji">${ach.icon}</span>
           <div class="ach-card-text-header">
-            <h3 class="ach-card-name">${ach.title}</h3>
-            <span class="ach-card-cat-label">${ach.category.toUpperCase()}</span>
+            <div class="ach-card-header-line">
+              <h3 class="ach-card-name">${ach.title}</h3>
+              <span class="ach-card-cat-label">${ach.category.toUpperCase()}</span>
+            </div>
+            <div class="ach-card-tiers-row">
+              ${starBadges}
+            </div>
           </div>
         </div>
-        <div class="ach-card-stars-box">${starBadges}</div>
       </div>
 
       <div class="ach-card-middle">
@@ -129,9 +136,11 @@ export class AchievementsModal {
         <div class="ach-bar-track">
           <div class="ach-bar-fill" style="width: ${progressPercent}%;"></div>
         </div>
-        <div class="ach-bar-details">
-          <span class="ach-bar-numbers">${ach.currentValue.toLocaleString()} / ${activeTier.target.toLocaleString()} ${ach.unit}</span>
-          <span class="ach-reward-tag">${isCompleted ? '👑 100%' : `+${activeTier.rewardCoins.toLocaleString()} 🪙 & +${activeTier.rewardXp.toLocaleString()} ⭐ XP`}</span>
+        <div class="ach-bar-progress-info">
+          <span class="ach-bar-numbers">${ach.currentValue.toLocaleString()} / ${activeTier.target.toLocaleString()} ${ach.unit} (${progressPercent}%)</span>
+        </div>
+        <div class="ach-bar-reward-line">
+          <span class="ach-reward-tag">${isCompleted ? '👑 Recompensas Coletadas' : `Recompensa: +${activeTier.rewardCoins.toLocaleString()} 🪙  |  +${activeTier.rewardXp.toLocaleString()} ⭐ XP`}</span>
         </div>
       </div>
     `;
