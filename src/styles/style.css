@@ -87,8 +87,8 @@ html, body {
   background: var(--na-purple-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1.5px solid var(--na-purple-border);
-  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   border-radius: 12px;
   padding: 14px;
   display: flex;
@@ -108,8 +108,8 @@ html, body {
 }
 
 .info-card:hover {
-  border-color: var(--na-purple-border-hover);
-  box-shadow: 0 8px 30px 0 rgba(168, 85, 247, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 10px rgba(168, 85, 247, 0.12);
 }
 
 .info-card-title {
@@ -211,8 +211,8 @@ html, body {
   background: rgba(22, 10, 46, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid #a855f7;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(168, 85, 247, 0.45);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), 0 0 10px rgba(168, 85, 247, 0.2);
   border-radius: 8px;
   max-height: 220px;
   overflow-y: auto;
@@ -242,7 +242,7 @@ html, body {
 .custom-select-option:hover {
   background: #7c3aed !important;
   color: #ffffff !important;
-  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.35);
 }
 
 .custom-select-option.selected {
@@ -263,7 +263,7 @@ html, body {
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 800;
-  border: 1.5px solid #a855f7;
+  border: 1px solid #a855f7;
   border-radius: 8px;
   padding: 10px 14px;
   cursor: pointer;
@@ -271,11 +271,11 @@ html, body {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.75);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
   border-color: #d8b4fe;
   transform: translateY(-1px);
 }
@@ -285,8 +285,8 @@ html, body {
   background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%) !important;
   position: relative;
   overflow: hidden;
-  border: 1.5px solid #c084fc !important;
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.5) !important;
+  border: 1px solid #c084fc !important;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.35) !important;
 }
 
 .btn-shop-highlight::after {
@@ -996,22 +996,31 @@ html, body {
 
 .shop-card {
   background: rgba(28, 13, 56, 0.75);
-  border: 1.5px solid var(--na-purple-border);
-  border-radius: 10px;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 12px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.shop-card:hover {
+  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(168, 85, 247, 0.12);
 }
 
 .shop-card.mastered {
-  border-color: #ffd700;
-  background: rgba(255, 215, 0, 0.08);
+  border-color: rgba(255, 215, 0, 0.6);
+  background: rgba(255, 215, 0, 0.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 8px rgba(255, 215, 0, 0.15);
 }
 
 .shop-card.equipped {
-  border-color: #00e676;
-  background: rgba(0, 230, 118, 0.08);
+  border-color: rgba(0, 230, 118, 0.6);
+  background: rgba(0, 230, 118, 0.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 8px rgba(0, 230, 118, 0.15);
 }
 
 .shop-card-header {
@@ -1094,21 +1103,22 @@ html, body {
 .btn-buy {
   background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
-  border: 1.5px solid #a855f7;
-  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+  border: 1px solid #a855f7;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
 }
 .btn-buy:hover {
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.45);
   border-color: #d8b4fe;
 }
 
 .btn-equip {
   background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
   color: #ffffff;
-  border: 1.5px solid #c084fc;
+  border: 1px solid #c084fc;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
 }
 .btn-equip:hover {
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.45);
 }
 
 .btn-equipped {
@@ -1344,11 +1354,11 @@ body.theme-gameboy .arcade-title {
  * ========================================================================= */
 .profile-card {
   background: linear-gradient(145deg, rgba(30, 11, 56, 0.95), rgba(15, 6, 30, 0.95));
-  border: 1.5px solid rgba(168, 85, 247, 0.4);
+  border: 1px solid rgba(168, 85, 247, 0.25);
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .profile-header {
@@ -1366,23 +1376,18 @@ body.theme-gameboy .arcade-title {
   align-items: center;
   justify-content: center;
   background: #110722;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
   font-size: 24px;
   flex-shrink: 0;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.profile-avatar-frame.border-bronze { border: 2.5px solid #cd7f32; box-shadow: 0 0 10px rgba(205, 127, 50, 0.5); }
-.profile-avatar-frame.border-silver { border: 2.5px solid #c0c0c0; box-shadow: 0 0 12px rgba(192, 192, 192, 0.6); }
-.profile-avatar-frame.border-gold { border: 2.5px solid #ffd700; box-shadow: 0 0 16px rgba(255, 215, 0, 0.8); }
-.profile-avatar-frame.border-platinum { border: 2.5px solid #00ffff; box-shadow: 0 0 18px rgba(0, 255, 255, 0.8); }
-.profile-avatar-frame.border-cosmic { border: 2.5px solid #ff00ff; box-shadow: 0 0 22px rgba(255, 0, 255, 0.9); }
-.profile-avatar-frame.border-god { border: 3px solid #ffea00; animation: pulseGlow 1.5s infinite alternate; }
-
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 10px #ffea00, 0 0 20px #ff007f; }
-  100% { box-shadow: 0 0 25px #ffea00, 0 0 40px #00ffff; }
-}
+.profile-avatar-frame.border-bronze { border: 2px solid #cd7f32; box-shadow: 0 2px 8px rgba(205, 127, 50, 0.35); }
+.profile-avatar-frame.border-silver { border: 2px solid #c0c0c0; box-shadow: 0 2px 8px rgba(192, 192, 192, 0.35); }
+.profile-avatar-frame.border-gold { border: 2px solid #ffd700; box-shadow: 0 2px 10px rgba(255, 215, 0, 0.4); }
+.profile-avatar-frame.border-platinum { border: 2px solid #00e5ff; box-shadow: 0 2px 10px rgba(0, 229, 255, 0.4); }
+.profile-avatar-frame.border-cosmic { border: 2px solid #ff00ff; box-shadow: 0 2px 12px rgba(255, 0, 255, 0.4); }
+.profile-avatar-frame.border-god { border: 2.5px solid #ffd700; box-shadow: 0 2px 14px rgba(255, 215, 0, 0.5); }
 
 .profile-meta {
   display: flex;
@@ -1447,7 +1452,7 @@ body.theme-gameboy .arcade-title {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.25);
 }
 
 .profile-xp-fill {
@@ -1459,32 +1464,54 @@ body.theme-gameboy .arcade-title {
 .profile-mastery-tag {
   font-size: 11px;
   color: #86efac;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.2);
   border-radius: 6px;
   padding: 4px 8px;
   text-align: center;
 }
 
+/* =========================================================================
+ * 🎁 BOTÃO DE BAÚ DE RECOMPENSAS NO CARD
+ * ========================================================================= */
 .btn-chest-reward {
   margin-top: 8px;
   width: 100%;
   padding: 8px 12px;
-  background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-  border: none;
-  border-radius: 8px;
-  color: #1a0b00;
+  border-radius: 10px;
   font-family: var(--font-ui);
   font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+
+.btn-chest-reward.empty-reward {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(168, 85, 247, 0.18);
+  color: #c4b5fd;
+  opacity: 0.65;
+  cursor: default;
+  box-shadow: none;
+  animation: none;
+  font-weight: 600;
+}
+
+.btn-chest-reward.active-reward {
+  background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+  border: 1px solid #ffd700;
+  color: #1a0b00;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-  animation: pulseChest 1.2s infinite alternate;
+  box-shadow: 0 4px 14px rgba(255, 215, 0, 0.35);
+  animation: pulseChest 1.4s infinite alternate;
 }
 
 @keyframes pulseChest {
-  0% { transform: scale(0.98); }
-  100% { transform: scale(1.02); box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+  0% { transform: scale(0.98); box-shadow: 0 2px 10px rgba(255, 215, 0, 0.25); }
+  100% { transform: scale(1.02); box-shadow: 0 4px 18px rgba(255, 215, 0, 0.45); }
 }
 
 /* =========================================================================
@@ -1494,8 +1521,9 @@ body.theme-gameboy .arcade-title {
   max-width: 480px;
   text-align: center;
   background: radial-gradient(circle at 50% 30%, #280f48 0%, #0c0418 100%);
-  border: 2px solid #ffd700;
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.4), 0 20px 40px rgba(0, 0, 0, 0.9);
+  border: 1.5px solid #ffd700;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.2);
 }
 
 .chest-body {
@@ -1524,7 +1552,7 @@ body.theme-gameboy .arcade-title {
 }
 
 .chest-pixel-art:hover {
-  transform: scale(1.15) rotate(-3deg);
+  transform: scale(1.12) rotate(-3deg);
 }
 
 .chest-burst-anim {
@@ -1533,7 +1561,7 @@ body.theme-gameboy .arcade-title {
 
 @keyframes burstAnim {
   0% { transform: scale(1); }
-  50% { transform: scale(1.4) rotate(10deg); }
+  50% { transform: scale(1.3) rotate(8deg); }
   100% { transform: scale(1.1); }
 }
 
@@ -1572,8 +1600,8 @@ body.theme-gameboy .arcade-title {
 }
 
 .reward-unlock-tag {
-  background: rgba(168, 85, 247, 0.2);
-  border: 1px solid #a855f7;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
   border-radius: 8px;
   padding: 6px 12px;
   color: #ffffff;
@@ -1589,7 +1617,7 @@ body.theme-gameboy .arcade-title {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(0, 230, 118, 0.6);
+  box-shadow: 0 2px 10px rgba(0, 230, 118, 0.4);
 }
 
 /* Confetes */
@@ -1609,38 +1637,44 @@ body.theme-gameboy .arcade-title {
 }
 
 /* =========================================================================
- * 🎨 CATEGORIAS DE SKINS NA LOJINHA
+ * 🎨 CATEGORIAS DE SKINS NA LOJINHA (Com Espaçamento & Pílulas Redondas)
  * ========================================================================= */
 .skin-categories-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-top: 18px;
+  margin-bottom: 20px;
+  padding-top: 6px;
 }
 
 .skin-category-pill {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  color: #c084fc;
-  padding: 6px 12px;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  color: #d8b4fe;
+  padding: 6px 14px;
+  border-radius: 9999px;
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .skin-category-pill:hover {
-  background: rgba(168, 85, 247, 0.2);
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.5);
   color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
 .skin-category-pill.active {
-  background: #a855f7;
-  border-color: #a855f7;
+  background: linear-gradient(135deg, #9333ea, #7c3aed);
+  border-color: #c084fc;
   color: #ffffff;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+  box-shadow: 0 2px 10px rgba(147, 51, 234, 0.35);
 }
 
 .shop-category-tag {
@@ -1668,7 +1702,7 @@ body.theme-gameboy .arcade-title {
 }
 
 .ach-tier-badge.unlocked {
-  filter: drop-shadow(0 0 4px #ffd700);
+  filter: drop-shadow(0 0 3px #ffd700);
   opacity: 1;
 }
 

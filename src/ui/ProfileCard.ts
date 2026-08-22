@@ -73,10 +73,13 @@ export class ProfileCard {
 
     if (chestButton) {
       if (data.unclaimedChests > 0) {
-        chestButton.classList.remove('hidden');
+        chestButton.className = 'btn-chest-reward active-reward';
         chestButton.innerHTML = `🎁 <strong>${data.unclaimedChests} Baú${data.unclaimedChests > 1 ? 's' : ''} para Abrir!</strong>`;
+        chestButton.removeAttribute('disabled');
       } else {
-        chestButton.classList.add('hidden');
+        chestButton.className = 'btn-chest-reward empty-reward';
+        chestButton.innerHTML = `🎁 <span>0 Baús Disponíveis (Suba de Nível)</span>`;
+        chestButton.setAttribute('disabled', 'true');
       }
     }
   }
