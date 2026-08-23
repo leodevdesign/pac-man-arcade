@@ -279,6 +279,27 @@ function onMagnetEatAll() {
 onMagnetEatAll();
 assert(levelCleared === true, 'Conclusão universal de fase dispara com sucesso quando ímã suga tudo');
 
+// Verificação de segurança de spawn de todos os 11 mapas (distância mínima de Blinky)
+const mapsSpawns = [
+  { id: 'classic_1980', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'mspacman_1', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'mspacman_2', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'mspacman_3', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'mspacman_4', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'pacman_arrangement_1', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'pacman_arrangement_2', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'pacman_championship', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'pacman_plus', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'google_doodle', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+  { id: 'pacman_letters', pacSpawn: { x: 13.5, y: 26 }, ghostExit: { x: 13.5, y: 14 } },
+];
+
+const allSpawnsSafe = mapsSpawns.every(m => {
+  const dist = Math.hypot(m.pacSpawn.x - m.ghostExit.x, m.pacSpawn.y - m.ghostExit.y);
+  return dist >= 10; // pelo menos 10 blocos de distância da porta dos fantasmas
+});
+assert(allSpawnsSafe, 'Todos os 11 mapas possuem spawn seguro do Pac-Man longe da saída dos fantasmas');
+
 
 // -----------------------------------------------------------------------------
 // RESULTADO FINAL

@@ -608,9 +608,9 @@ export const MAP_PRESETS: MapConfig[] = [
     tunnelRows: [17],
     map: PACMAN_PLUS_MAZE,
     forbiddenUpTiles: FORBIDDEN_UP_TILES,
-    pacmanSpawn: { x: 13.5, y: 14 },
+    pacmanSpawn: { x: 13.5, y: 26 },
     ghostHouseExit: { x: 13.5, y: 14 },
-    fruitSpawn: { x: 13.5, y: 26 },
+    fruitSpawn: { x: 13.5, y: 20 },
   },
   {
     id: 'google_doodle',
